@@ -30,54 +30,60 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     if ((index + 1) * this.frameWidth > this.frames * this.frameWidth) {
         index -= this.frameWidth;
     }
-    
+	
     var locX = x;
     var locY = y;
     var offset = this.startY;
-    ctx.drawImage(this.spriteSheet, 
-				this.direction * this.frameWidth, 
-				index * this.frameWidth + offset, // source from sheet
- 				this.frameWidth, this.frameHeight, 
-				locX, locY, this.frameWidth * scaleBy, 
+    ctx.drawImage(this.spriteSheet, this.direction * this.frameWidth, index * this.frameWidth + offset,
+    			this.frameWidth, this.frameHeight, 
+    			locX, locY, this.frameWidth * scaleBy, 
 				this.frameHeight * scaleBy);
 }
 
-Animation.prototype.currentFrame = function(){
-    return Math.floor(this.elapsedTime / this.frameDuration);
+Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
+Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
+
+/*################ BUILDINGS ################*/
+function Building(game){Entity.call(this, game, 0, 0);}
+Building.prototype = new Entity();
+Building.prototype.constructor = Building;
+Building.prototype.update = function(){}
+Building.prototype.draw = function(ctx){
+	var x = 267;
+	var y = 0;
+	var width = 125;
+	var pos1 = 700;
+	var pos2 = 220;
+	var scale = width * 1; 
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), x, y, width,width, pos1, pos2, scale, scale);
+    Entity.prototype.draw.call(this);
 }
 
-Animation.prototype.isDone = function(){
-    return (this.elapsedTime >= this.totalTime);
-}
+/*################ Background ################*/
 
 function Background(game){
-    Entity.call(this, game, 0, 400);
-    this.radius = 200;
+    Entity.call(this, game, 0, 0);
 }
 
 Background.prototype = new Entity();
 Background.prototype.constructor = Background;
-
-Background.prototype.update = function(){
-}
-
+Background.prototype.update = function(){}
 Background.prototype.draw = function(ctx){
-    ctx.fillStyle = "SaddleBrown";
-    ctx.fillRect(0, 500, 800, 300);
-    Entity.prototype.draw.call(this);
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain.png"), 0, 0, 900,900, 0, 0, 900, 900);
 }
+
+/*################ OGRE ################*/
+
 
 function Ogre(game){
     var frameWidth = 73;
     
-    this.animation = new Animation(
-					ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, frameWidth, frameWidth, 0.10, 5, true, true);
-    this.attackAnimation = new Animation(
-					ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, frameWidth, frameWidth, 0.10, 4, false, true);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, frameWidth, frameWidth, 0.10, 5, true, true);
+    this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, frameWidth, frameWidth, 0.10, 4, true, true);
     this.attacking = false;
     this.radius = 100;
     this.ground = 400;
-    Entity.call(this, game, 0, 400);
+    Entity.call(this, game, 0, 250);
 }
 
 Ogre.prototype = new Entity();
@@ -89,6 +95,9 @@ Ogre.prototype.update = function(){
 		this.attackAnimation.direction = this.game.direction;
 	}
     if (this.game.space) {
+		this.attacking = true;
+	}
+	if (this.x === 650){
 		this.attacking = true;
 	}
         
@@ -112,11 +121,13 @@ Ogre.prototype.draw = function(ctx){
     Entity.prototype.draw.call(this);
 }
 
-// the "main" code begins here
+/*################ ASSET_MANAGER ################*/
 
 var ASSET_MANAGER = new AssetManager();
 
 ASSET_MANAGER.queueDownload("./img/ogre-2.png");
+ASSET_MANAGER.queueDownload("./img/human-buildings.png");
+ASSET_MANAGER.queueDownload("./img/terrain.png");
 
 ASSET_MANAGER.downloadAll(function(){
     console.log("starting up da sheild");
@@ -125,9 +136,11 @@ ASSET_MANAGER.downloadAll(function(){
     
     var gameEngine = new GameEngine();
     var bg = new Background(gameEngine);
+	var townhall = new Building(gameEngine);
     var ogre = new Ogre(gameEngine);
     
     gameEngine.addEntity(bg);
+	gameEngine.addEntity(townhall);
     gameEngine.addEntity(ogre);
     
     gameEngine.init(ctx);
