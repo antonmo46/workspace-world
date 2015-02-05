@@ -56,6 +56,9 @@ Building.prototype.draw = function(ctx){
 	var pos2 = 220;
 	var scale = width * 1; 
     ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), x, y, width,width, pos1, pos2, scale, scale);
+	//ctx.strokeStyle = "Chartreuse";
+    //ctx.strokeRect(pos1,pos2,width,width);
+	
     Entity.prototype.draw.call(this);
 }
 
@@ -76,10 +79,10 @@ Background.prototype.draw = function(ctx){
 
 
 function Ogre(game){
-    var frameWidth = 73;
+    this.frameWidth = 73;
     
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, frameWidth, frameWidth, 0.10, 5, true, true);
-    this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, frameWidth, frameWidth, 0.10, 4, true, true);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
+    this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
     this.attacking = false;
     this.radius = 100;
     this.ground = 400;
@@ -118,6 +121,8 @@ Ogre.prototype.draw = function(ctx){
 		this.x += 1;
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
     }
+	ctx.strokeStyle = "Chartreuse";
+    ctx.strokeRect(this.x+15,this.y+10,this.frameWidth-17,this.frameWidth-15);
     Entity.prototype.draw.call(this);
 }
 
