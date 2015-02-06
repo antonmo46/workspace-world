@@ -1,3 +1,5 @@
+var health=100;
+
 function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse){
     this.spriteSheet = spriteSheet;
     this.startX = startX;
@@ -49,15 +51,24 @@ Building.prototype = new Entity();
 Building.prototype.constructor = Building;
 Building.prototype.update = function(){}
 Building.prototype.draw = function(ctx){
+
 	var x = 267;
 	var y = 0;
 	var width = 125;
 	var pos1 = 700;
 	var pos2 = 220;
-	var scale = width * 1; 
+	var scale = width * 1;
     ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), x, y, width,width, pos1, pos2, scale, scale);
 	//ctx.strokeStyle = "Chartreuse";
     //ctx.strokeRect(pos1,pos2,width,width);
+    if (health > 50) {
+        ctx.fillStyle="#33CC33";
+    } else if (health > 20 && health < 50) {
+        ctx.fillStyle="#FFD700";
+    } else if (health < 20) {
+        ctx.fillStyle="#CC0000";
+    }
+    ctx.fillRect(pos1,pos2,(health/100)*120,10);
 	
     Entity.prototype.draw.call(this);
 }
@@ -103,9 +114,10 @@ Ogre.prototype.update = function(){
 	if (this.x === 650){
 		this.attacking = true;
 	}
-        
+
     if (this.attacking) {
         if (this.attackAnimation.isDone()) {
+
             this.attackAnimation.elapsedTime = 0;
             this.attacking = false;
         }
@@ -116,6 +128,9 @@ Ogre.prototype.update = function(){
 Ogre.prototype.draw = function(ctx){
     if (this.attacking) {
         this.attackAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
+        if (health > 0) {
+            health -= .05;
+        }
     }
     else {
 		this.x += 1;
