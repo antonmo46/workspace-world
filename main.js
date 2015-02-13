@@ -53,23 +53,28 @@ Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTi
 
 /*################ BUILDINGS ################*/
 function Building(game){
-	this.x = 700;
-	this.y = 220;
+	this.xpos = 700;
+	this.ypos = 220;
 	this.width = 125
-	this.healthbar = new Healthbar(this.x, this.y, 120, 10);
+	this.healthbar = new Healthbar(this.xpos, this.ypos, 120, 10);
 	Entity.call(this, game, 0, 0);
 }
 Building.prototype = new Entity();
+
 Building.prototype.constructor = Building;
-Building.prototype.update = function(){}
+
+Building.prototype.update = function(){
+	this.healthbar.update();
+	Entity.prototype.update.call(this);
+}
 Building.prototype.draw = function(ctx){
 	var framex = 267;
 	var framey = 0;
 	var width = 125;
 	var scale = width * 1;
 	
-    ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framyx, framey, width,width, this.x, this.y, scale, scale);
-    this.healthbar.draw(this.x, this.y);
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framex, framey, width,width, this.xpos, this.ypos, scale, scale);
+    this.healthbar.draw(this.xpos, this.ypos, ctx);
 	
     Entity.prototype.draw.call(this);
 }
@@ -93,11 +98,12 @@ Background.prototype.draw = function(ctx){
 function Ogre(game, townhall){
     this.frameWidth = 73;
     this.building = townhall;
-    #this.healthbar = new Healthbar();
+    //this.healthbar = new Healthbar();
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
     this.attacking = false;
-    this.attack = 0.5;
+    this.attack = 0.1;
+	this.speed = 2;
     this.radius = 100;
     this.ground = 400;
     Entity.call(this, game, 0, 250);
@@ -135,7 +141,7 @@ Ogre.prototype.draw = function(ctx){
         }
     }
     else {
-		this.x += 1;
+		this.x += this.speed;
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
     }
 	ctx.strokeStyle = "Chartreuse";
@@ -146,25 +152,30 @@ Ogre.prototype.draw = function(ctx){
 
 /*############## Health Bar #############*/
 
-function Healthbar(x,y, width, height) {
-	this.x = x;
-	this.y = y;
-	this.health;
+function Healthbar(width, height) {
+	console.log("w,h"+width+","+height);
+	//Height and width not accurate for some reason. hard coded for buildnig atm.
+	this.width = 120;
+	this.height = 5;
+	this.health = 100;
 	this.color = "#33CC33";
-	
 }
+
+Healthbar.prototype.constructor = Healthbar;
+
 Healthbar.prototype.update = function() {
 	if (this.health > 50) {
         this.color = "#33CC33";
-    } else if (this.health > 20 && health < 50) {
+    } else if (this.health > 20 && this.health < 50) {
         this.color = "#FFD700";
     } else if (this.health < 20) {
         this.color = "#CC0000";
     }
 }
-Healthbar.prototype.draw = function(pos1, pos2) {
-	ctx.fillStyle=this.color;
-    ctx.fillRect(pos1,pos2,(health/100)*width,height);
+
+Healthbar.prototype.draw = function(pos1, pos2, ctx) {
+	ctx.fillStyle = this.color;
+    ctx.fillRect(pos1,pos2,(this.health/100)*this.width,this.height);
 }
 
 /*################ ASSET_MANAGER ################*/
