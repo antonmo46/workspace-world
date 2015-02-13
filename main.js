@@ -1,5 +1,3 @@
-var health=100;
-
 function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse){
     this.spriteSheet = spriteSheet;
     this.startX = startX;
@@ -45,30 +43,33 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
+#Add global matrix for grid states
+
+#Add global building
+
+#Add global list of towers
+
+#Add global list of enemies
+
 /*################ BUILDINGS ################*/
-function Building(game){Entity.call(this, game, 0, 0);}
+function Building(game){
+	this.x = 700;
+	this.y = 220;
+	this.width = 125
+	this.healthbar = new Healthbar(this.x, this.y, 120, 10);
+	Entity.call(this, game, 0, 0);
+}
 Building.prototype = new Entity();
 Building.prototype.constructor = Building;
 Building.prototype.update = function(){}
 Building.prototype.draw = function(ctx){
-
-	var x = 267;
-	var y = 0;
+	var framex = 267;
+	var framey = 0;
 	var width = 125;
-	var pos1 = 700;
-	var pos2 = 220;
 	var scale = width * 1;
-    ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), x, y, width,width, pos1, pos2, scale, scale);
-	//ctx.strokeStyle = "Chartreuse";
-    //ctx.strokeRect(pos1,pos2,width,width);
-    if (health > 50) {
-        ctx.fillStyle="#33CC33";
-    } else if (health > 20 && health < 50) {
-        ctx.fillStyle="#FFD700";
-    } else if (health < 20) {
-        ctx.fillStyle="#CC0000";
-    }
-    ctx.fillRect(pos1,pos2,(health/100)*120,10);
+	
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framyx, framey, width,width, this.x, this.y, scale, scale);
+    this.healthbar.draw(this.x, this.y);
 	
     Entity.prototype.draw.call(this);
 }
@@ -89,12 +90,14 @@ Background.prototype.draw = function(ctx){
 /*################ OGRE ################*/
 
 
-function Ogre(game){
+function Ogre(game, townhall){
     this.frameWidth = 73;
-    
+    this.building = townhall;
+    #this.healthbar = new Healthbar();
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
     this.attacking = false;
+    this.attack = 0.5;
     this.radius = 100;
     this.ground = 400;
     Entity.call(this, game, 0, 250);
@@ -117,7 +120,6 @@ Ogre.prototype.update = function(){
 
     if (this.attacking) {
         if (this.attackAnimation.isDone()) {
-
             this.attackAnimation.elapsedTime = 0;
             this.attacking = false;
         }
@@ -128,8 +130,8 @@ Ogre.prototype.update = function(){
 Ogre.prototype.draw = function(ctx){
     if (this.attacking) {
         this.attackAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
-        if (health > 0) {
-            health -= .05;
+        if (this.building.healthbar.health > 0) {
+            this.building.healthbar.health -= this.attack;
         }
     }
     else {
@@ -139,6 +141,30 @@ Ogre.prototype.draw = function(ctx){
 	ctx.strokeStyle = "Chartreuse";
     ctx.strokeRect(this.x+15,this.y+10,this.frameWidth-17,this.frameWidth-15);
     Entity.prototype.draw.call(this);
+}
+
+
+/*############## Health Bar #############*/
+
+function Healthbar(x,y, width, height) {
+	this.x = x;
+	this.y = y;
+	this.health;
+	this.color = "#33CC33";
+	
+}
+Healthbar.prototype.update = function() {
+	if (this.health > 50) {
+        this.color = "#33CC33";
+    } else if (this.health > 20 && health < 50) {
+        this.color = "#FFD700";
+    } else if (this.health < 20) {
+        this.color = "#CC0000";
+    }
+}
+Healthbar.prototype.draw = function(pos1, pos2) {
+	ctx.fillStyle=this.color;
+    ctx.fillRect(pos1,pos2,(health/100)*width,height);
 }
 
 /*################ ASSET_MANAGER ################*/
@@ -157,7 +183,7 @@ ASSET_MANAGER.downloadAll(function(){
     var gameEngine = new GameEngine();
     var bg = new Background(gameEngine);
 	var townhall = new Building(gameEngine);
-    var ogre = new Ogre(gameEngine);
+    var ogre = new Ogre(gameEngine, townhall);
     
     gameEngine.addEntity(bg);
 	gameEngine.addEntity(townhall);
