@@ -43,13 +43,13 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
-#Add global matrix for grid states
+//Add global matrix for grid states
 
-#Add global building
+//Add global building
 
-#Add global list of towers
+//Add global list of towers
 
-#Add global list of enemies
+//Add global list of enemies
 
 /*################ BUILDINGS ################*/
 function Building(game){
