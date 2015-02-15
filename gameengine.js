@@ -76,6 +76,26 @@ GameEngine.prototype.startInput = function () {
         console.log(String.fromCharCode(e.which));
         e.preventDefault();
     }, false);
+	
+	var getXandY = function (e) {
+	var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left - 23.5;
+	var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top - 23.5;
+
+	x = Math.floor(x / 39.55);
+	y = Math.floor(y / 39.55);
+
+	return { x: x, y: y };
+    }
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        //console.log(getXandY(e));
+        that.mouse = getXandY(e);
+    }, false);
+
+    this.ctx.canvas.addEventListener("click", function (e) {
+        console.log(getXandY(e));
+        that.click = getXandY(e);
+    }, false);
 
     console.log('Input started');
 }
