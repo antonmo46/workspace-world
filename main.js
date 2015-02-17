@@ -11,9 +11,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     
     this.totalTime = frameDuration * frames;
     this.elapsedTime = 0;
-	this.direction = 2;
-}
-
+	this.direction = 2;}
 Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     var scaleBy = scaleBy || 1.1;
     this.elapsedTime += tick;
@@ -37,9 +35,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     ctx.drawImage(this.spriteSheet, this.direction * this.frameWidth, index * this.frameWidth + offset,
     			this.frameWidth, this.frameHeight, 
     			locX, locY, this.frameWidth * scaleBy, 
-				this.frameHeight * scaleBy);
-}
-
+				this.frameHeight * scaleBy);}
 Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
@@ -53,20 +49,17 @@ var towers = [];
 var enemies = [];
 /*################ BUILDINGS ################*/
 function Building(game){
-	this.xpos = 700;
-	this.ypos = 220;
+	this.xpos = 1455;
+	this.ypos = 280;
 	this.width = 125
-	this.healthbar = new Healthbar(this.xpos, this.ypos, 120, 10);
-	Entity.call(this, game, 0, 0);
-}
+    //height width offset
+	this.healthbar = new Healthbar(95,4,15);
+	Entity.call(this, game, 0, 0);}
 Building.prototype = new Entity();
-
 Building.prototype.constructor = Building;
-
 Building.prototype.update = function(){
 	this.healthbar.update();
-	Entity.prototype.update.call(this);
-}
+	Entity.prototype.update.call(this);}
 Building.prototype.draw = function(ctx){
 	var framex = 267;
 	var framey = 0;
@@ -76,28 +69,19 @@ Building.prototype.draw = function(ctx){
     ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framex, framey, width,width, this.xpos, this.ypos, scale, scale);
     this.healthbar.draw(this.xpos, this.ypos, ctx);
 	
-    Entity.prototype.draw.call(this);
-}
+    Entity.prototype.draw.call(this);}
 
 /*################ Background ################*/
-
-function Background(game){
-    Entity.call(this, game, 0, 0);
-}
-
+function Background(game){Entity.call(this, game, 0, 0);}
 Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 Background.prototype.update = function(){}
-Background.prototype.draw = function(ctx){
-    ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain.png"), 0, 0, 900,900, 0, 0, 900, 900);
-}
+Background.prototype.draw = function(ctx){ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);}
 
 /*################ OGRE ################*/
-
-
 function Ogre(game){
     this.frameWidth = 73;
-    this.healthbar = new Healthbar(20, 20);
+    this.healthbar = new Healthbar(45, 3, 20);
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
     this.attacking = false;
@@ -105,12 +89,9 @@ function Ogre(game){
 	this.speed = 2;
     this.radius = 100;
     this.ground = 400;
-    Entity.call(this, game, 0, 250);
-}
-
+    Entity.call(this, game, 0, 310);}
 Ogre.prototype = new Entity();
 Ogre.prototype.constructor = Ogre;
-
 Ogre.prototype.update = function(){
 	if (this.game.directionChanged){
 		this.animation.direction = this.game.direction;
@@ -119,7 +100,7 @@ Ogre.prototype.update = function(){
     if (this.game.space) {
 		this.attacking = true;
 	}
-	if (this.x === 650){
+	if (this.x === 1410){
 		this.attacking = true;
 	}
 
@@ -130,9 +111,7 @@ Ogre.prototype.update = function(){
             this.attacking = false;
         }
     }
-    Entity.prototype.update.call(this);
-}
-
+    Entity.prototype.update.call(this);}
 Ogre.prototype.draw = function(ctx){
     if (this.attacking) {
         this.attackAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
@@ -144,26 +123,21 @@ Ogre.prototype.draw = function(ctx){
 		this.x += this.speed;
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
     }
-	//ctx.strokeStyle = "Chartreuse";
-    //ctx.strokeRect(this.x+15,this.y+10,this.frameWidth-17,this.frameWidth-15);
 	this.healthbar.draw(this.x, this.y, ctx);
-    Entity.prototype.draw.call(this);
-}
-
+    Entity.prototype.draw.call(this);}
 
 /*############## Health Bar #############*/
-
-function Healthbar(width, height) {
+function Healthbar(width, height, offset) {
 	console.log("w,h"+width+","+height);
 	//Height and width not accurate for some reason. hard coded for buildnig atm.
-	this.width = 120;
-	this.height = 5;
+	this.width = width;
+	this.height = height;
+    this.offset = offset;
+    //var width = width;
+    //var height = height;
 	this.health = 100;
-	this.color = "#33CC33";
-}
-
+	this.color = "#33CC33";}
 Healthbar.prototype.constructor = Healthbar;
-
 Healthbar.prototype.update = function() {
 	if (this.health > 50) {
         this.color = "#33CC33";
@@ -171,34 +145,81 @@ Healthbar.prototype.update = function() {
         this.color = "#FFD700";
     } else if (this.health < 20) {
         this.color = "#CC0000";
-    }
-}
-
+    }}
 Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 	ctx.fillStyle = this.color;
-    ctx.fillRect(pos1,pos2,(this.health/100)*this.width,this.height);
+    ctx.fillRect(pos1+this.offset,pos2,(this.health/100)*this.width,this.height);}
+
+/*############## Board #############*/
+function GameBoard(game) {
+    Entity.call(this, game, 20, 20);
+    this.grid = false;
+    this.board = [];
+    for (var i = 0; i < 19; i++) {
+        this.board.push([]);
+        for (var j = 0; j < 11; j++) {
+            this.board[i].push(0);
+        }
+    }}
+GameBoard.prototype = new Entity();
+GameBoard.prototype.constructor = GameBoard;
+GameBoard.prototype.update = function () {
+    // check if clicked within a grid
+    if (this.game.click && this.game.mouse.x < 19 && this.game.mouse.y < 11) {
+        this.board[this.game.click.x][this.game.click.y] = 1;
+    }
+    Entity.prototype.update.call(this);
 }
+GameBoard.prototype.draw = function (ctx) {
+    var size = 65;
+    for (var i = 0; i < 19; i++) {
+        for (var j = 0; j < 11; j++) {
+            ctx.strokeStyle = "Red";
+            ctx.strokeRect(i * size, j * size, size, size);
+
+            if (this.board[i][j] === 1) {
+                ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65,i * 65, j * 65, 65, 65);
+            }
+        }
+    }
+
+    // draw mouse shadow
+    if (this.game.mouse) {
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        // check if moved within a grid
+        if(this.game.mouse.x < 19 && this.game.mouse.y < 11){
+            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65, this.game.mouse.x * 65, this.game.mouse.y * 65, 65, 65);
+        }
+        ctx.restore();
+    }}
 
 /*################ ASSET_MANAGER ################*/
-
 var ASSET_MANAGER = new AssetManager();
-
 ASSET_MANAGER.queueDownload("./img/ogre-2.png");
 ASSET_MANAGER.queueDownload("./img/human-buildings.png");
-ASSET_MANAGER.queueDownload("./img/terrain.png");
+ASSET_MANAGER.queueDownload("./img/human-towers.png");
+ASSET_MANAGER.queueDownload("./img/terrain2.png");
+ASSET_MANAGER.queueDownload("./img/960px-Blank_Go_board.png");
+ASSET_MANAGER.queueDownload("./img/black.png");
+ASSET_MANAGER.queueDownload("./img/white.png");
 
 ASSET_MANAGER.downloadAll(function(){
     console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
     var ctx = canvas.getContext('2d');
+
     
     var gameEngine = new GameEngine();
+    var gameboard = new GameBoard(gameEngine);
     var bg = new Background(gameEngine);
 	building = new Building(gameEngine);
     var ogre = new Ogre(gameEngine);
+
     
     gameEngine.addEntity(bg);
-	gameEngine.addEntity(building);
+	gameEngine.addEntity(building);    
+    gameEngine.addEntity(gameboard);
     gameEngine.addEntity(ogre);
     
     gameEngine.init(ctx);
