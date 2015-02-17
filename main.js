@@ -47,13 +47,13 @@ var building;
 var towers = [];
 //Add global list of enemies
 var enemies = [];
+
 /*################ BUILDINGS ################*/
 function Building(game){
 	this.xpos = 1455;
 	this.ypos = 280;
 	this.width = 125
-    //height width offset
-	this.healthbar = new Healthbar(95,4,15);
+	this.healthbar = new Healthbar(95,4,10, 100);
 	Entity.call(this, game, 0, 0);}
 Building.prototype = new Entity();
 Building.prototype.constructor = Building;
@@ -81,15 +81,17 @@ Background.prototype.draw = function(ctx){ctx.drawImage(ASSET_MANAGER.getAsset("
 /*################ OGRE ################*/
 function Ogre(game){
     this.frameWidth = 73;
-    this.healthbar = new Healthbar(45, 3, 20);
+    this.healthbar = new Healthbar(150, 3, 20, 30);
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
     this.attacking = false;
     this.attack = .1;
-	this.speed = 2;
+	this.speed = 5;
     this.radius = 100;
     this.ground = 400;
-    Entity.call(this, game, 0, 310);}
+    Entity.call(this, game, 0, 310);
+}
+
 Ogre.prototype = new Entity();
 Ogre.prototype.constructor = Ogre;
 Ogre.prototype.update = function(){
@@ -103,23 +105,23 @@ Ogre.prototype.update = function(){
 	if (this.x === 1410){
 		this.attacking = true;
 	}
-
     if (this.attacking) {
-
         if (this.attackAnimation.isDone()) {
             this.attackAnimation.elapsedTime = 0;
             this.attacking = false;
         }
     }
-    Entity.prototype.update.call(this);}
+	this.healthbar.update();
+    Entity.prototype.update.call(this);
+}
+
 Ogre.prototype.draw = function(ctx){
     if (this.attacking) {
         this.attackAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
-			if (building.healthbar.health > 0) {
-				building.healthbar.health -= this.attack;
-			}
-    }
-    else {
+		if (building.healthbar.health > 0) {
+			building.healthbar.health -= this.attack;
+		}
+    } else {
 		this.x += this.speed;
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
     }
@@ -127,23 +129,20 @@ Ogre.prototype.draw = function(ctx){
     Entity.prototype.draw.call(this);}
 
 /*############## Health Bar #############*/
-function Healthbar(width, height, offset) {
-	console.log("w,h"+width+","+height);
-	//Height and width not accurate for some reason. hard coded for buildnig atm.
+function Healthbar(width, height, offset, hitpoints) {
 	this.width = width;
 	this.height = height;
     this.offset = offset;
-    //var width = width;
-    //var height = height;
-	this.health = 100;
+	this.health = hitpoints;
+	this.maxhealth = hitpoints;
 	this.color = "#33CC33";}
 Healthbar.prototype.constructor = Healthbar;
 Healthbar.prototype.update = function() {
-	if (this.health > 50) {
+	if (this.health > .5*this.maxhealth) {
         this.color = "#33CC33";
-    } else if (this.health > 20 && this.health < 50) {
+    } else if (this.health > .2*this.maxhealth && this.health < .5*this.maxhealth) {
         this.color = "#FFD700";
-    } else if (this.health < 20) {
+    } else if (this.health < .2*this.maxhealth) {
         this.color = "#CC0000";
     }}
 Healthbar.prototype.draw = function(pos1, pos2, ctx) {
@@ -155,9 +154,13 @@ function GameBoard(game) {
     Entity.call(this, game, 20, 20);
     this.grid = false;
     this.board = [];
-    for (var i = 0; i < 19; i++) {
+	// Adjust these 3 variables to change grid size.
+	this.gridwidth = 22;
+	this.gridheight = 11;
+	this.size = 65;
+    for (var i = 0; i < this.gridwidth; i++) {
         this.board.push([]);
-        for (var j = 0; j < 11; j++) {
+        for (var j = 0; j < this.gridheight; j++) {
             this.board[i].push(0);
         }
     }}
@@ -165,31 +168,31 @@ GameBoard.prototype = new Entity();
 GameBoard.prototype.constructor = GameBoard;
 GameBoard.prototype.update = function () {
     // check if clicked within a grid
-    if (this.game.click && this.game.mouse.x < 19 && this.game.mouse.y < 11) {
+    if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight) {
         this.board[this.game.click.x][this.game.click.y] = 1;
     }
     Entity.prototype.update.call(this);
 }
 GameBoard.prototype.draw = function (ctx) {
-    var size = 65;
-    for (var i = 0; i < 19; i++) {
-        for (var j = 0; j < 11; j++) {
-            ctx.strokeStyle = "Red";
-            ctx.strokeRect(i * size, j * size, size, size);
-
-            if (this.board[i][j] === 1) {
-                ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65,i * 65, j * 65, 65, 65);
-            }
-        }
-    }
-
+	
+		for (var i = 0; i < this.gridwidth; i++) {
+			for (var j = 0; j < this.gridheight; j++) {
+				if(this.grid) {
+					ctx.strokeStyle = "Red";
+					ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
+				}
+				if (this.board[i][j] === 1) {
+					ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
+				}
+			}
+		}
     // draw mouse shadow
     if (this.game.mouse) {
         ctx.save();
         ctx.globalAlpha = 0.5;
         // check if moved within a grid
-        if(this.game.mouse.x < 19 && this.game.mouse.y < 11){
-            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65, this.game.mouse.x * 65, this.game.mouse.y * 65, 65, 65);
+        if(this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight){
+            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, this.game.mouse.x * this.size, this.game.mouse.y * this.size, this.size, this.size);
         }
         ctx.restore();
     }}

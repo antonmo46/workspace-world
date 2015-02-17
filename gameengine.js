@@ -78,8 +78,8 @@ GameEngine.prototype.startInput = function () {
     }, false);
 	
     var getXandY = function (e) {
-        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left - 23.5;
-        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top - 23.5;
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
         x = Math.floor(x / 65);
         y = Math.floor(y / 65);
         return { x: x, y: y };
