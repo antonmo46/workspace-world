@@ -39,8 +39,9 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
+/*########### GLOBAL DATA STRUCTURES ##################*/
 //Add global matrix for grid states
-
+var matrixmap = [];
 //Add global building
 var building;
 //Add global list of towers
@@ -77,6 +78,28 @@ Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 Background.prototype.update = function(){}
 Background.prototype.draw = function(ctx){ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);}
+
+/*################ TOWER ###############*/
+function Tower(game, xindex, yindex) {
+	this.xindex = xindex;
+	this.yindex = yindex;
+	this.range = 200;
+	this.attack = 10;
+	//this.buildingAnimation
+	//this.attackAnimation
+
+}
+
+Tower.prototype = new Entity();
+Tower.prototype.constructor = Tower;
+
+Tower.prototype.update = function() {
+
+}
+
+Tower.prototype.draw = function(ctx) {
+
+}
 
 /*################ OGRE ################*/
 function Ogre(game){
@@ -153,15 +176,15 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 function GameBoard(game) {
     Entity.call(this, game, 20, 20);
     this.grid = false;
-    this.board = [];
+    matrixmap = [];
 	// Adjust these 3 variables to change grid size.
 	this.gridwidth = 22;
 	this.gridheight = 11;
 	this.size = 65;
     for (var i = 0; i < this.gridwidth; i++) {
-        this.board.push([]);
+        matrixmap.push([]);
         for (var j = 0; j < this.gridheight; j++) {
-            this.board[i].push(0);
+            matrixmap[i].push(0);
         }
     }}
 GameBoard.prototype = new Entity();
@@ -169,24 +192,41 @@ GameBoard.prototype.constructor = GameBoard;
 GameBoard.prototype.update = function () {
     // check if clicked within a grid
     if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight) {
-        this.board[this.game.click.x][this.game.click.y] = 1;
+        matrixmap[this.game.click.x][this.game.click.y] = 1;
+		towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
+		console.log(towers);
     }
+	
+	//Update building
+	
+	//Update towers
+	
+	//Update enemies
+	
     Entity.prototype.update.call(this);
 }
+
 GameBoard.prototype.draw = function (ctx) {
-	
-		for (var i = 0; i < this.gridwidth; i++) {
-			for (var j = 0; j < this.gridheight; j++) {
-				if(this.grid) {
-					ctx.strokeStyle = "Red";
-					ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
-				}
-				if (this.board[i][j] === 1) {
-					ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
-				}
+	//Draw grid
+	for (var i = 0; i < this.gridwidth; i++) {
+		for (var j = 0; j < this.gridheight; j++) {
+			if(this.grid) {
+				ctx.strokeStyle = "Red";
+				ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
+			}
+			if (matrixmap[i][j] === 1) {
+				ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
 			}
 		}
-    // draw mouse shadow
+	}
+	
+	//Draw building
+	
+	//Draw towers
+	
+	//Draw enemies
+	
+    //Draw mouse shadow
     if (this.game.mouse) {
         ctx.save();
         ctx.globalAlpha = 0.5;
