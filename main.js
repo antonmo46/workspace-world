@@ -40,6 +40,9 @@ Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
 /*########### GLOBAL DATA STRUCTURES ##################*/
+var gameboard;
+//Background
+var background;
 //Add global matrix for grid states
 var matrixmap = [];
 //Add global building
@@ -55,12 +58,16 @@ function Building(game){
 	this.ypos = 280;
 	this.width = 125
 	this.healthbar = new Healthbar(95,4,10, 100);
-	Entity.call(this, game, 0, 0);}
-Building.prototype = new Entity();
+	Entity.call(this, game, 0, 0);
+}
+//Building.prototype = new Entity();
 Building.prototype.constructor = Building;
+
 Building.prototype.update = function(){
 	this.healthbar.update();
-	Entity.prototype.update.call(this);}
+	//Entity.prototype.update.call(this);
+}
+
 Building.prototype.draw = function(ctx){
 	var framex = 267;
 	var framey = 0;
@@ -70,21 +77,29 @@ Building.prototype.draw = function(ctx){
     ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framex, framey, width,width, this.xpos, this.ypos, scale, scale);
     this.healthbar.draw(this.xpos, this.ypos, ctx);
 	
-    Entity.prototype.draw.call(this);}
+    //Entity.prototype.draw.call(this);
+}
 
 /*################ Background ################*/
 function Background(game){Entity.call(this, game, 0, 0);}
-Background.prototype = new Entity();
+//Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 Background.prototype.update = function(){}
-Background.prototype.draw = function(ctx){ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);}
+Background.prototype.draw = function(ctx){
+	ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
+}
 
 /*################ TOWER ###############*/
 function Tower(game, xindex, yindex) {
 	this.xindex = xindex;
 	this.yindex = yindex;
-	this.range = 200;
-	this.attack = 10;
+	this.size = 65;
+	this.x = xindex * this.size + this.size/2;
+	this.y = yindex * this.size + this.size/2;
+	console.log(this.x +","+ this.y);
+	this.range = 15;
+	this.attack = .1;
+	this.target = 0;
 	//this.buildingAnimation
 	//this.attackAnimation
 
@@ -94,62 +109,84 @@ Tower.prototype = new Entity();
 Tower.prototype.constructor = Tower;
 
 Tower.prototype.update = function() {
-
+	
+	if (this.target != 0) { //Tower has target
+ 		this.target.healthbar.health -= this.attack;
+		if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx))^2) + (Math.abs((this.y - this.target.comy))^2)) > this.range) {
+			this.target = 0;
+		}
+	}
+	if (this.target == 0) { //Tower has no target
+		var newtarget = 0;
+		var farthest = 0;
+		for (var i = 0; i < enemies.length; i++) {
+				//If enemy is in range
+				if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
+					//If enemy x value greater than current target				
+					if (enemies[i].comx > farthest) {
+						farthest = enemies[i].comx;
+						newtarget = enemies[i];
+					}
+				}
+		}
+		this.target = newtarget;
+		
+	}
+	
 }
 
 Tower.prototype.draw = function(ctx) {
-
+	ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
+	if (this.target != 0) {
+		ctx.beginPath();
+		ctx.moveTo(this.x, this.y);
+		ctx.lineTo(this.target.comx, this.target.comy);
+		ctx.stroke();
+	}
 }
 
 /*################ OGRE ################*/
-function Ogre(game){
+function Ogre(){
     this.frameWidth = 73;
+	this.x = 0;
+	this.y = 300;
+	this.comx = this.x + 36;
+	this.comy = this.y + 36;
     this.healthbar = new Healthbar(150, 3, 20, 30);
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
     this.attacking = false;
     this.attack = .1;
-	this.speed = 5;
+	this.speed = 2;
     this.radius = 100;
     this.ground = 400;
-    Entity.call(this, game, 0, 310);
 }
 
-Ogre.prototype = new Entity();
 Ogre.prototype.constructor = Ogre;
 Ogre.prototype.update = function(){
-	if (this.game.directionChanged){
-		this.animation.direction = this.game.direction;
-		this.attackAnimation.direction = this.game.direction;
-	}
-    if (this.game.space) {
-		this.attacking = true;
-	}
 	if (this.x === 1410){
 		this.attacking = true;
+	} else {
+		this.x += this.speed;
+		this.comx = this.x + 36;
+		this.comy = this.y + 36;
 	}
-    if (this.attacking) {
-        if (this.attackAnimation.isDone()) {
-            this.attackAnimation.elapsedTime = 0;
-            this.attacking = false;
-        }
-    }
 	this.healthbar.update();
-    Entity.prototype.update.call(this);
 }
 
 Ogre.prototype.draw = function(ctx){
     if (this.attacking) {
-        this.attackAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
+        this.attackAnimation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
 		if (building.healthbar.health > 0) {
 			building.healthbar.health -= this.attack;
 		}
-    } else {
-		this.x += this.speed;
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
+    } else {		
+        this.animation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
     }
-	this.healthbar.draw(this.x, this.y, ctx);
-    Entity.prototype.draw.call(this);}
+	if (this.healthbar.health < this.healthbar.maxhealth) {
+		this.healthbar.draw(this.x, this.y, ctx);
+	}
+}
 
 /*############## Health Bar #############*/
 function Healthbar(width, height, offset, hitpoints) {
@@ -158,7 +195,8 @@ function Healthbar(width, height, offset, hitpoints) {
     this.offset = offset;
 	this.health = hitpoints;
 	this.maxhealth = hitpoints;
-	this.color = "#33CC33";}
+	this.color = "#33CC33";
+}
 Healthbar.prototype.constructor = Healthbar;
 Healthbar.prototype.update = function() {
 	if (this.health > .5*this.maxhealth) {
@@ -167,15 +205,17 @@ Healthbar.prototype.update = function() {
         this.color = "#FFD700";
     } else if (this.health < .2*this.maxhealth) {
         this.color = "#CC0000";
-    }}
+    }
+}
 Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 	ctx.fillStyle = this.color;
-    ctx.fillRect(pos1+this.offset,pos2,(this.health/100)*this.width,this.height);}
+    ctx.fillRect(pos1+this.offset,pos2,(this.health/100)*this.width,this.height);
+}
 
 /*############## Board #############*/
 function GameBoard(game) {
     Entity.call(this, game, 20, 20);
-    this.grid = false;
+    this.grid = false; //Sets if grid is visible or not.
     matrixmap = [];
 	// Adjust these 3 variables to change grid size.
 	this.gridwidth = 22;
@@ -198,10 +238,19 @@ GameBoard.prototype.update = function () {
     }
 	
 	//Update building
-	
-	//Update towers
-	
+	building.update();
+	//Update towers 
+	for(var i = 0; i < towers.length; i++) {
+		towers[i].update();
+	}
 	//Update enemies
+	for(var i = 0; i < enemies.length; i++) {
+		enemies[i].update();
+		if (enemies[i].healthbar.health <= 0) {
+			enemies.splice(i,1);
+		}
+	}
+	//Remove enemies that have been killed
 	
     Entity.prototype.update.call(this);
 }
@@ -219,13 +268,18 @@ GameBoard.prototype.draw = function (ctx) {
 			}
 		}
 	}
-	
+	//Draw background
+	background.draw(ctx);
 	//Draw building
-	
-	//Draw towers
-	
+	building.draw(ctx);
+	//Draw towers 
+	for(var i = 0; i < towers.length; i++) {
+		towers[i].draw(ctx);
+	}
 	//Draw enemies
-	
+	for(var i = 0; i < enemies.length; i++) {
+		enemies[i].draw(ctx);
+	}
     //Draw mouse shadow
     if (this.game.mouse) {
         ctx.save();
@@ -235,7 +289,9 @@ GameBoard.prototype.draw = function (ctx) {
             ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, this.game.mouse.x * this.size, this.game.mouse.y * this.size, this.size, this.size);
         }
         ctx.restore();
-    }}
+    }
+	Entity.prototype.draw.call(this);
+}
 
 /*################ ASSET_MANAGER ################*/
 var ASSET_MANAGER = new AssetManager();
@@ -254,16 +310,14 @@ ASSET_MANAGER.downloadAll(function(){
 
     
     var gameEngine = new GameEngine();
-    var gameboard = new GameBoard(gameEngine);
-    var bg = new Background(gameEngine);
+    gameboard = new GameBoard(gameEngine);
+    background = new Background(gameEngine);
 	building = new Building(gameEngine);
-    var ogre = new Ogre(gameEngine);
-
-    
-    gameEngine.addEntity(bg);
-	gameEngine.addEntity(building);    
+    //var ogre = new Ogre(gameEngine);
+    //gameEngine.addEntity(bg);
+	//gameEngine.addEntity(building);    
     gameEngine.addEntity(gameboard);
-    gameEngine.addEntity(ogre);
+    //gameEngine.addEntity(ogre);
     
     gameEngine.init(ctx);
     gameEngine.start();

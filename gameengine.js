@@ -63,16 +63,20 @@ GameEngine.prototype.startInput = function () {
     var that = this;
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
-        if (String.fromCharCode(e.which) === ' ') that.space = true;
-		else if (String.fromCharCode(e.which) === '\'') {
-			that.direction = (that.direction + 1) % 8; // right key
-			that.directionChanged = true;
-		}
-		else if (String.fromCharCode(e.which) === '%'){ 
-			that.direction = (that.direction - 1) % 8;	// left key
-			if (that.direction < 0) that.direction += 8;
-			that.directionChanged = true;
-		} 	
+        if (String.fromCharCode(e.which) === ' ') {
+			//that.space = true;
+			var ogre = new Ogre();
+			enemies.push(ogre);
+			console.log(enemies);
+		} //else if (String.fromCharCode(e.which) === '\'') {
+			// that.direction = (that.direction + 1) % 8; // right key
+			// that.directionChanged = true;
+		// }
+		// else if (String.fromCharCode(e.which) === '%'){ 
+			// that.direction = (that.direction - 1) % 8;	// left key
+			// if (that.direction < 0) that.direction += 8;
+			// that.directionChanged = true;
+		// } 	
         console.log(String.fromCharCode(e.which));
         e.preventDefault();
     }, false);
@@ -94,6 +98,7 @@ GameEngine.prototype.startInput = function () {
         //console.log(getXandY(e));
         that.click = getXandY(e);
     }, false);
+	
 
     console.log('Input started');
 }
