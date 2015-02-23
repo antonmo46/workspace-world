@@ -58,6 +58,7 @@ var enemies = [];
 var toolbar;
 var money = 300;
 var score = 0;
+var buildmode = 0;
 
 /*################ BUILDINGS ################*/
 function Building(game){
@@ -269,7 +270,11 @@ function GameBoard(game) {
     for (var i = 0; i < this.gridwidth; i++) {
         matrixmap.push([]);
         for (var j = 0; j < this.gridheight; j++) {
-            matrixmap[i].push(0);
+			if (j == 5) {
+				matrixmap[i].push(1);
+			} else {
+				matrixmap[i].push(0);
+			}
         }
     }}
 GameBoard.prototype = new Entity();
@@ -277,19 +282,24 @@ GameBoard.prototype.constructor = GameBoard;
 GameBoard.prototype.update = function () {
     // check if clicked within a grid
     if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
-        matrixmap[this.game.click.x][this.game.click.y] = 1;
-		towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
-        money -= 100;
-        score += 15;
-		console.log(towers);
-    }
-    if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
-        matrixmap[this.game.click.x][this.game.click.y] = 1;
-        towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
-        money -= 100;
-        score += 15;
-        console.log(towers);
-    }
+		if (matrixmap[this.game.click.x][this.game.click.y] == 0) {
+			if (buildmode == 1) {
+				matrixmap[this.game.click.x][this.game.click.y] = 1;
+				towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
+				money -= 100;
+				score += 15;
+				buildmode = 0;
+				console.log(towers);
+			}
+		}
+	}
+    // if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
+        // matrixmap[this.game.click.x][this.game.click.y] = 1;
+        // towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
+        // money -= 100;
+        // score += 15;
+        // console.log(towers);
+    // }
 	
 	//Update building
 	building.update();
@@ -319,9 +329,10 @@ GameBoard.prototype.draw = function (ctx) {
               ctx.strokeStyle = "Red";
             ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);  
             }
-			if (matrixmap[i][j] === 1) {
-				ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
-			}
+			
+			// if (matrixmap[i][j] === 1) {
+				// ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
+			// }
 		}
 	}
 	//Draw background
@@ -342,7 +353,11 @@ GameBoard.prototype.draw = function (ctx) {
         ctx.globalAlpha = 0.5;
         // check if moved within a grid
         if(this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight){
-            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, this.game.mouse.x * this.size, this.game.mouse.y * this.size, this.size, this.size);
+			if (matrixmap[this.game.mouse.x][this.game.mouse.y] == 0 ) {
+				if (buildmode == 1) {
+					ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, this.game.mouse.x * this.size, this.game.mouse.y * this.size, this.size, this.size);
+				}
+			}
         }
         ctx.restore();
     }

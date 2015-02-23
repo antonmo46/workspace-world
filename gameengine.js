@@ -69,7 +69,10 @@ GameEngine.prototype.startInput = function () {
 			var ogre = new Ogre();
 			enemies.push(ogre);
 			console.log(enemies);
-		} //else if (String.fromCharCode(e.which) === '\'') {
+		}else if (String.fromCharCode(e.which) === '1') {
+			if (money >= 100) {
+				buildmode = 1;
+			}
 			// that.direction = (that.direction + 1) % 8; // right key
 			// that.directionChanged = true;
 		// }
@@ -78,7 +81,7 @@ GameEngine.prototype.startInput = function () {
 			// if (that.direction < 0) that.direction += 8;
 			// that.directionChanged = true;
 		// }
-        else if (e.which === 27) {
+        }else if (e.which === 27) {
             that.gameover = that.gameover === 1 ? 0 : 1;
             console.log('gameover=' + that.gameover);
          } 	
