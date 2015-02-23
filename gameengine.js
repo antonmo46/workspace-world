@@ -38,6 +38,7 @@ function GameEngine() {
     this.surfaceWidth = null;
     this.surfaceHeight = null;
 	this.direction = 0;
+    this.gameover = 0;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -76,8 +77,13 @@ GameEngine.prototype.startInput = function () {
 			// that.direction = (that.direction - 1) % 8;	// left key
 			// if (that.direction < 0) that.direction += 8;
 			// that.directionChanged = true;
-		// } 	
-        console.log(String.fromCharCode(e.which));
+		// }
+        else if (e.which === 27) {
+            that.gameover = that.gameover === 1 ? 0 : 1;
+            console.log('gameover=' + that.gameover);
+         } 	
+        //console.log(String.fromCharCode(e.which));
+        console.log(e.which);
         e.preventDefault();
     }, false);
 	
@@ -136,13 +142,16 @@ GameEngine.prototype.update = function () {
 }
 
 GameEngine.prototype.loop = function () {
-    this.clockTick = this.timer.tick();
-    this.update();
-    this.draw();
-    this.click = null;
-    this.space = null;
-	//this.direction = null;
-	this.directionChanged = null;
+    if (this.gameover === 0){
+        this.clockTick = this.timer.tick();
+        this.update();
+        this.draw();
+        this.click = null;
+        this.space = null;
+        //this.direction = null;
+        this.directionChanged = null;
+    }
+    
 }
 
 function Entity(game, x, y) {

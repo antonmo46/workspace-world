@@ -40,6 +40,8 @@ Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
 /*########### GLOBAL DATA STRUCTURES ##################*/
+var gameEngine;
+
 var gameboard;
 //Background
 var background;
@@ -51,6 +53,11 @@ var building;
 var towers = [];
 //Add global list of enemies
 var enemies = [];
+
+//Add global cotrol
+var toolbar;
+var money = 300;
+var score = 0;
 
 /*################ BUILDINGS ################*/
 function Building(game){
@@ -64,6 +71,9 @@ function Building(game){
 Building.prototype.constructor = Building;
 
 Building.prototype.update = function(){
+    if(this.healthbar.health <= 0){
+        gameEngine.gameover = 1;
+    }
 	this.healthbar.update();
 	//Entity.prototype.update.call(this);
 }
@@ -86,8 +96,45 @@ function Background(game){Entity.call(this, game, 0, 0);}
 Background.prototype.constructor = Background;
 Background.prototype.update = function(){}
 Background.prototype.draw = function(ctx){
-	ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
+	//ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
 }
+
+/*################ Toolbar Box ################*/
+function Toolbar(game){
+    this.w = 46;
+    this.h = 38;
+    this.lx = 1600;
+    this.ly = 10;
+    this.scalex = this.w * 1;
+    this.scaley = this.h * 1;
+    this.color = "Chartreuse";
+
+    this.action = -1;
+
+    Entity.call(this, game, 0, 0);}
+Toolbar.prototype.constructor = Toolbar;
+Toolbar.prototype.update = function(){  
+}
+Toolbar.prototype.draw = function(ctx){
+    for(var i = 0; i < 3; i++) {
+        ctx.strokeStyle = this.color;
+        ctx.strokeRect(this.lx + this.w * i + i, this.ly, this.w, this.h);
+    }
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),6,251,  this.w,this.h,this.lx + this.scalex * 0 + 0,this.ly,this.scalex,this.scaley);
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),251,292,this.w,this.h,this.lx + this.scalex * 1 + 1,this.ly,this.scalex,this.scaley);
+    ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),300,292,this.w,this.h,this.lx + this.scalex * 2 + 2,this.ly,this.scalex,this.scaley);
+    ctx.fillStyle = "#FF0000";
+    ctx.font = "14px sans-serif"
+    ctx.fillText  ("Money: " + money, this.lx, 80);
+    ctx.fillText  ("Score: " + score, this.lx, 100);
+    ctx.fillText  ("Time: " + parseInt(gameEngine.timer.gameTime,10) + " sec(s)", this.lx, 120);
+    if(gameEngine.gameover === 1){
+        ctx.fillText  ("GameOver:", this.lx, 140);
+    }
+
+}
+
+
 
 /*################ TOWER ###############*/
 function Tower(game, xindex, yindex) {
@@ -107,7 +154,6 @@ function Tower(game, xindex, yindex) {
 
 Tower.prototype = new Entity();
 Tower.prototype.constructor = Tower;
-
 Tower.prototype.update = function() {
 	
 	if (this.target != 0) { //Tower has target
@@ -132,7 +178,6 @@ Tower.prototype.update = function() {
 		this.target = newtarget;
 		
 	}
-	
 }
 
 Tower.prototype.draw = function(ctx) {
@@ -215,7 +260,7 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 /*############## Board #############*/
 function GameBoard(game) {
     Entity.call(this, game, 20, 20);
-    this.grid = false; //Sets if grid is visible or not.
+    this.grid = true; //Sets if grid is visible or not.
     matrixmap = [];
 	// Adjust these 3 variables to change grid size.
 	this.gridwidth = 22;
@@ -231,10 +276,19 @@ GameBoard.prototype = new Entity();
 GameBoard.prototype.constructor = GameBoard;
 GameBoard.prototype.update = function () {
     // check if clicked within a grid
-    if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight) {
+    if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
         matrixmap[this.game.click.x][this.game.click.y] = 1;
 		towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
+        money -= 100;
+        score += 15;
 		console.log(towers);
+    }
+    if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
+        matrixmap[this.game.click.x][this.game.click.y] = 1;
+        towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
+        money -= 100;
+        score += 15;
+        console.log(towers);
     }
 	
 	//Update building
@@ -247,6 +301,8 @@ GameBoard.prototype.update = function () {
 	for(var i = 0; i < enemies.length; i++) {
 		enemies[i].update();
 		if (enemies[i].healthbar.health <= 0) {
+            money += 100;
+            score += 30;
 			enemies.splice(i,1);
 		}
 	}
@@ -259,10 +315,10 @@ GameBoard.prototype.draw = function (ctx) {
 	//Draw grid
 	for (var i = 0; i < this.gridwidth; i++) {
 		for (var j = 0; j < this.gridheight; j++) {
-			if(this.grid) {
-				ctx.strokeStyle = "Red";
-				ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
-			}
+            if(this.grid){
+              ctx.strokeStyle = "Red";
+            ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);  
+            }
 			if (matrixmap[i][j] === 1) {
 				ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
 			}
@@ -295,6 +351,7 @@ GameBoard.prototype.draw = function (ctx) {
 
 /*################ ASSET_MANAGER ################*/
 var ASSET_MANAGER = new AssetManager();
+ASSET_MANAGER.queueDownload("./img/toolbar.png");
 ASSET_MANAGER.queueDownload("./img/ogre-2.png");
 ASSET_MANAGER.queueDownload("./img/human-buildings.png");
 ASSET_MANAGER.queueDownload("./img/human-towers.png");
@@ -309,13 +366,15 @@ ASSET_MANAGER.downloadAll(function(){
     var ctx = canvas.getContext('2d');
 
     
-    var gameEngine = new GameEngine();
+    gameEngine = new GameEngine();
     gameboard = new GameBoard(gameEngine);
     background = new Background(gameEngine);
 	building = new Building(gameEngine);
     //var ogre = new Ogre(gameEngine);
     //gameEngine.addEntity(bg);
-	//gameEngine.addEntity(building);    
+	//gameEngine.addEntity(building);
+    toolbar = new Toolbar(gameEngine);
+    gameEngine.addEntity(toolbar);
     gameEngine.addEntity(gameboard);
     //gameEngine.addEntity(ogre);
     
