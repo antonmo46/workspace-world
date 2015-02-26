@@ -255,6 +255,53 @@ Grunt.prototype.draw = function(ctx){
 }
 
 
+/*################ TROLL ################*/
+function Troll(){
+    this.frameWidth = 62.4;
+    this.frameHeight = 54;
+  this.x = 1200;
+  this.y = 300;
+  this.comx = this.x + 31.2;
+  this.comy = this.y + 27;
+    this.healthbar = new Healthbar(150, 3, 20, 30);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), 0, 0,
+     this.frameWidth, this.frameHeight, 0.1, 5, true, true);
+     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), 0, 337,
+      this.frameWidth, this.frameHeight, .1, 3, true, true);
+    this.attacking = false;
+    this.attack = .1;
+  this.speed = 2;
+    this.radius = 100;
+    this.ground = 400;
+}
+
+Troll.prototype.constructor = Troll;
+Troll.prototype.update = function(){
+  if (this.x === 1410){
+    this.attacking = true;
+  } else {
+    this.x += this.speed;
+    this.comx = this.x + 31.2;
+    this.comy = this.y + 27;
+  }
+  this.healthbar.update();
+}
+
+Troll.prototype.draw = function(ctx){
+    if (this.attacking) {
+        this.attackAnimation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
+    if (building.healthbar.health > 0) {
+      building.healthbar.health -= this.attack;
+    }
+    } else {
+        this.animation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
+    }
+  if (this.healthbar.health < this.healthbar.maxhealth) {
+    this.healthbar.draw(this.x, this.y, ctx);
+  }
+}
+
+
 /*################ OGRE ################*/
 function Ogre(){
     this.frameWidth = 73;
@@ -444,6 +491,7 @@ var ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload("./img/toolbar.png");
 ASSET_MANAGER.queueDownload("./img/ogre-2.png");
 ASSET_MANAGER.queueDownload("./img/grunt.png");
+ASSET_MANAGER.queueDownload("./img/troll.png");
 ASSET_MANAGER.queueDownload("./img/human-buildings.png");
 ASSET_MANAGER.queueDownload("./img/human-towers.png");
 ASSET_MANAGER.queueDownload("./img/terrain2.png");

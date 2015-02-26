@@ -73,7 +73,13 @@ GameEngine.prototype.startInput = function () {
       var grunt = new Grunt();
       enemies.push(grunt);
       console.log(enemies);
-    }else if (String.fromCharCode(e.which) === '1') {
+    }
+    else if (String.fromCharCode(e.which) === '3') {
+      var troll = new Troll();
+      enemies.push(troll);
+      console.log(enemies);
+    }
+    else if (String.fromCharCode(e.which) === '1') {
 			if (money >= 100) {
 				buildmode = 1;
 			}
