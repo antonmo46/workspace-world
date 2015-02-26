@@ -54,7 +54,7 @@ var towers = [];
 //Add global list of enemies
 var enemies = [];
 
-//Add global cotrol
+//Add global control
 var toolbar;
 var money = 300;
 var score = 0;
@@ -97,7 +97,7 @@ function Background(game){Entity.call(this, game, 0, 0);}
 Background.prototype.constructor = Background;
 Background.prototype.update = function(){}
 Background.prototype.draw = function(ctx){
-	//ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
+	ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
 }
 
 /*################ Toolbar Box ################*/
@@ -110,11 +110,21 @@ function Toolbar(game){
     this.scaley = this.h * 1;
     this.color = "Chartreuse";
 
-    this.action = -1;
+    this.cx = 0;
+    this.cy = 0;
+
+
 
     Entity.call(this, game, 0, 0);}
 Toolbar.prototype.constructor = Toolbar;
-Toolbar.prototype.update = function(){  
+Toolbar.prototype.update = function(){
+	if(this.game.click){
+    	this.cx = this.game.click.x;
+	  	this.cy = this.game.click.y;
+	  	if(this.cx > this.lx && this.cx < this.lx + (this.w * 3) + 1){
+	  		buildmode = (this.lx + (this.w * 3) - this.cx + 3) % 3;
+	  	}
+    } 
 }
 Toolbar.prototype.draw = function(ctx){
     for(var i = 0; i < 3; i++) {
@@ -132,6 +142,13 @@ Toolbar.prototype.draw = function(ctx){
     if(gameEngine.gameover === 1){
         ctx.fillText  ("GameOver:", this.lx, 140);
     }
+    //if(cx === 0 || !cx){
+    	//var cx = this.game.click?this.game.click.x:0
+		//var cy = this.game.click?this.game.click.y:0	
+   // }
+    ctx.fillText  ("Buildmode: " + buildmode, this.lx, 160);
+    ctx.fillText  ("cx: " + this.cx, this.lx, 180);
+    ctx.fillText  ("cy: " + this.cy, this.lx, 200);
 
 }
 
@@ -281,11 +298,20 @@ GameBoard.prototype = new Entity();
 GameBoard.prototype.constructor = GameBoard;
 GameBoard.prototype.update = function () {
     // check if clicked within a grid
-    if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
-		if (matrixmap[this.game.click.x][this.game.click.y] == 0) {
+    if(this.game.mouse){
+	    var mx = Math.floor(this.game.mouse.x / 65);
+	    var my = Math.floor(this.game.mouse.y / 65);
+    }
+    if(this.game.click){
+    	var cx = Math.floor(this.game.click.x / 65);
+	    var cy = Math.floor(this.game.click.y / 65);
+    }
+    
+    if (this.game.click && mx < this.gridwidth && my < this.gridheight && money >= 100) {
+		if (matrixmap[cx][cy] == 0) {
 			if (buildmode == 1) {
-				matrixmap[this.game.click.x][this.game.click.y] = 1;
-				towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
+				matrixmap[cx][cy] = 1;
+				towers.push(new Tower(this.game, cx, cy));
 				money -= 100;
 				score += 15;
 				buildmode = 0;
@@ -349,13 +375,15 @@ GameBoard.prototype.draw = function (ctx) {
 	}
     //Draw mouse shadow
     if (this.game.mouse) {
+    	var mx = Math.floor(this.game.mouse.x / 65);
+   		var my = Math.floor(this.game.mouse.y / 65);
         ctx.save();
         ctx.globalAlpha = 0.5;
         // check if moved within a grid
-        if(this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight){
-			if (matrixmap[this.game.mouse.x][this.game.mouse.y] == 0 ) {
+        if(mx < this.gridwidth && my < this.gridheight){
+			if (matrixmap[mx][my] == 0 ) {
 				if (buildmode == 1) {
-					ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, this.game.mouse.x * this.size, this.game.mouse.y * this.size, this.size, this.size);
+					ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, mx * this.size, my * this.size, this.size, this.size);
 				}
 			}
         }
