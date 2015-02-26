@@ -8,7 +8,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.frames = frames;
     this.loop = loop;
     this.reverse = reverse;
-    
+
     this.totalTime = frameDuration * frames;
     this.elapsedTime = 0;
 	this.direction = 2;}
@@ -20,7 +20,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
             this.elapsedTime = 0;
         }
     }
-    else 
+    else
         if (this.isDone()) {
             return;
         }
@@ -28,13 +28,13 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     if ((index + 1) * this.frameWidth > this.frames * this.frameWidth) {
         index -= this.frameWidth;
     }
-	
+
     var locX = x;
     var locY = y;
     var offset = this.startY;
-    ctx.drawImage(this.spriteSheet, this.direction * this.frameWidth, index * this.frameWidth + offset,
-    			this.frameWidth, this.frameHeight, 
-    			locX, locY, this.frameWidth * scaleBy, 
+    ctx.drawImage(this.spriteSheet, this.direction * this.frameWidth, index * this.frameHeight + offset,
+    			this.frameWidth, this.frameHeight,
+    			locX, locY, this.frameWidth * scaleBy,
 				this.frameHeight * scaleBy);}
 Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
@@ -84,10 +84,10 @@ Building.prototype.draw = function(ctx){
 	var framey = 0;
 	var width = 125;
 	var scale = width * 1;
-	
+
     ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framex, framey, width,width, this.xpos, this.ypos, scale, scale);
     this.healthbar.draw(this.xpos, this.ypos, ctx);
-	
+
     //Entity.prototype.draw.call(this);
 }
 
@@ -124,7 +124,7 @@ Toolbar.prototype.update = function(){
 	  	if(this.cx > this.lx && this.cx < this.lx + (this.w * 3) + 1){
 	  		buildmode = (this.lx + (this.w * 3) - this.cx + 3) % 3;
 	  	}
-    } 
+    }
 }
 Toolbar.prototype.draw = function(ctx){
     for(var i = 0; i < 3; i++) {
@@ -144,7 +144,7 @@ Toolbar.prototype.draw = function(ctx){
     }
     //if(cx === 0 || !cx){
     	//var cx = this.game.click?this.game.click.x:0
-		//var cy = this.game.click?this.game.click.y:0	
+		//var cy = this.game.click?this.game.click.y:0
    // }
     ctx.fillText  ("Buildmode: " + buildmode, this.lx, 160);
     ctx.fillText  ("cx: " + this.cx, this.lx, 180);
@@ -173,7 +173,7 @@ function Tower(game, xindex, yindex) {
 Tower.prototype = new Entity();
 Tower.prototype.constructor = Tower;
 Tower.prototype.update = function() {
-	
+
 	if (this.target != 0) { //Tower has target
  		this.target.healthbar.health -= this.attack;
 		if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx))^2) + (Math.abs((this.y - this.target.comy))^2)) > this.range) {
@@ -186,7 +186,7 @@ Tower.prototype.update = function() {
 		for (var i = 0; i < enemies.length; i++) {
 				//If enemy is in range
 				if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
-					//If enemy x value greater than current target				
+					//If enemy x value greater than current target
 					if (enemies[i].comx > farthest) {
 						farthest = enemies[i].comx;
 						newtarget = enemies[i];
@@ -194,7 +194,7 @@ Tower.prototype.update = function() {
 				}
 		}
 		this.target = newtarget;
-		
+
 	}
 }
 
@@ -207,6 +207,53 @@ Tower.prototype.draw = function(ctx) {
 		ctx.stroke();
 	}
 }
+
+/*################ GRUNT ################*/
+function Grunt(){
+    this.frameWidth = 76;
+    this.frameHeight = 54;
+  this.x = 0;
+  this.y = 300;
+  this.comx = this.x + 35;
+  this.comy = this.y + 28.5;
+    this.healthbar = new Healthbar(150, 3, 20, 30);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), 0, 0,
+     this.frameWidth, this.frameHeight, 0.1, 5, true, true);
+     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), 0, 272,
+      this.frameWidth, this.frameHeight, 0.1, 4, true, true);
+    this.attacking = false;
+    this.attack = .1;
+  this.speed = 2;
+    this.radius = 100;
+    this.ground = 400;
+}
+
+Grunt.prototype.constructor = Grunt;
+Grunt.prototype.update = function(){
+  if (this.x === 1410){
+    this.attacking = true;
+  } else {
+    this.x += this.speed;
+    this.comx = this.x + 35;
+    this.comy = this.y + 28.5;
+  }
+  this.healthbar.update();
+}
+
+Grunt.prototype.draw = function(ctx){
+    if (this.attacking) {
+        this.attackAnimation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
+    if (building.healthbar.health > 0) {
+      building.healthbar.health -= this.attack;
+    }
+    } else {
+        this.animation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
+    }
+  if (this.healthbar.health < this.healthbar.maxhealth) {
+    this.healthbar.draw(this.x, this.y, ctx);
+  }
+}
+
 
 /*################ OGRE ################*/
 function Ogre(){
@@ -243,7 +290,7 @@ Ogre.prototype.draw = function(ctx){
 		if (building.healthbar.health > 0) {
 			building.healthbar.health -= this.attack;
 		}
-    } else {		
+    } else {
         this.animation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
     }
 	if (this.healthbar.health < this.healthbar.maxhealth) {
@@ -306,7 +353,7 @@ GameBoard.prototype.update = function () {
     	var cx = Math.floor(this.game.click.x / 65);
 	    var cy = Math.floor(this.game.click.y / 65);
     }
-    
+
     if (this.game.click && mx < this.gridwidth && my < this.gridheight && money >= 100) {
 		if (matrixmap[cx][cy] == 0) {
 			if (buildmode == 1) {
@@ -326,10 +373,10 @@ GameBoard.prototype.update = function () {
         // score += 15;
         // console.log(towers);
     // }
-	
+
 	//Update building
 	building.update();
-	//Update towers 
+	//Update towers
 	for(var i = 0; i < towers.length; i++) {
 		towers[i].update();
 	}
@@ -343,7 +390,7 @@ GameBoard.prototype.update = function () {
 		}
 	}
 	//Remove enemies that have been killed
-	
+
     Entity.prototype.update.call(this);
 }
 
@@ -353,9 +400,9 @@ GameBoard.prototype.draw = function (ctx) {
 		for (var j = 0; j < this.gridheight; j++) {
             if(this.grid){
               ctx.strokeStyle = "Red";
-            ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);  
+            ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
             }
-			
+
 			// if (matrixmap[i][j] === 1) {
 				// ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
 			// }
@@ -365,7 +412,7 @@ GameBoard.prototype.draw = function (ctx) {
 	background.draw(ctx);
 	//Draw building
 	building.draw(ctx);
-	//Draw towers 
+	//Draw towers
 	for(var i = 0; i < towers.length; i++) {
 		towers[i].draw(ctx);
 	}
@@ -396,6 +443,7 @@ GameBoard.prototype.draw = function (ctx) {
 var ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload("./img/toolbar.png");
 ASSET_MANAGER.queueDownload("./img/ogre-2.png");
+ASSET_MANAGER.queueDownload("./img/grunt.png");
 ASSET_MANAGER.queueDownload("./img/human-buildings.png");
 ASSET_MANAGER.queueDownload("./img/human-towers.png");
 ASSET_MANAGER.queueDownload("./img/terrain2.png");
@@ -408,7 +456,7 @@ ASSET_MANAGER.downloadAll(function(){
     var canvas = document.getElementById('gameWorld');
     var ctx = canvas.getContext('2d');
 
-    
+
     gameEngine = new GameEngine();
     gameboard = new GameBoard(gameEngine);
     background = new Background(gameEngine);
@@ -420,7 +468,7 @@ ASSET_MANAGER.downloadAll(function(){
     gameEngine.addEntity(toolbar);
     gameEngine.addEntity(gameboard);
     //gameEngine.addEntity(ogre);
-    
+
     gameEngine.init(ctx);
     gameEngine.start();
 });

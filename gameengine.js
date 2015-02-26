@@ -69,14 +69,18 @@ GameEngine.prototype.startInput = function () {
 			var ogre = new Ogre();
 			enemies.push(ogre);
 			console.log(enemies);
-		}else if (String.fromCharCode(e.which) === '1') {
+		}else if (String.fromCharCode(e.which) === '2') {
+      var grunt = new Grunt();
+      enemies.push(grunt);
+      console.log(enemies);
+    }else if (String.fromCharCode(e.which) === '1') {
 			if (money >= 100) {
 				buildmode = 1;
 			}
 			// that.direction = (that.direction + 1) % 8; // right key
 			// that.directionChanged = true;
 		// }
-		// else if (String.fromCharCode(e.which) === '%'){ 
+		// else if (String.fromCharCode(e.which) === '%'){
 			// that.direction = (that.direction - 1) % 8;	// left key
 			// if (that.direction < 0) that.direction += 8;
 			// that.directionChanged = true;
@@ -84,12 +88,12 @@ GameEngine.prototype.startInput = function () {
         }else if (e.which === 27) {
             that.gameover = that.gameover === 1 ? 0 : 1;
             console.log('gameover=' + that.gameover);
-         } 	
+         }
         //console.log(String.fromCharCode(e.which));
         console.log(e.which);
         e.preventDefault();
     }, false);
-	
+
     var getXandY = function (e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
@@ -107,7 +111,7 @@ GameEngine.prototype.startInput = function () {
         //console.log(getXandY(e));
         that.click = getXandY(e);
     }, false);
-	
+
 
     console.log('Input started');
 }
@@ -154,7 +158,7 @@ GameEngine.prototype.loop = function () {
         //this.direction = null;
         this.directionChanged = null;
     }
-    
+
 }
 
 function Entity(game, x, y) {
