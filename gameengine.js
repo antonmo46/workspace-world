@@ -73,18 +73,18 @@ GameEngine.prototype.startInput = function () {
 
       setInterval(function() {
         if(timer < amount_in_wave && period == 0) {
-          var ogre = new Ogre();
-          enemies.push(ogre);
-          timer++;
-        }
-        else if(timer < amount_in_wave && period == 1) {
           var troll = new Troll();
           enemies.push(troll);
           timer++;
         }
-        else if(timer < amount_in_wave && period == 2){
+        else if(timer < amount_in_wave && period == 1) {
           var grunt = new Grunt();
           enemies.push(grunt);
+          timer++;
+        }
+        else if(timer < amount_in_wave && period == 2){
+          var ogre = new Ogre();
+          enemies.push(ogre);
           timer++;
         }
         if(timer == amount_in_wave)  {
@@ -102,9 +102,9 @@ GameEngine.prototype.startInput = function () {
           period++;
         }
 
-        console.log("timer is " + timer);
-        console.log("amount in wave " + amount_in_wave);
-        console.log("period " + amount_in_wave);
+        //console.log("timer is " + timer);
+        //console.log("amount in wave " + amount_in_wave);
+        //console.log("period " + amount_in_wave);
       }, 1000);
 
 
