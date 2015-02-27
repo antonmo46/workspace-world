@@ -20,10 +20,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
             this.elapsedTime = 0;
         }
     }
-    else
-        if (this.isDone()) {
-            return;
-        }
+
     var index = this.reverse ? this.frames - this.currentFrame() - 1 : this.currentFrame();
     if ((index + 1) * this.frameWidth > this.frames * this.frameWidth) {
         index -= this.frameWidth;
@@ -164,9 +161,10 @@ Toolbar.prototype.draw = function(ctx){
 
 /*################ TOWER ###############*/
 function Tower(game, xindex, yindex) {
+  this.d = 0;
 	this.xindex = xindex;
 	this.yindex = yindex;
-	this.size = 65;
+	this.size = 64;
 	this.x = xindex * this.size + this.size/2;
 	this.y = yindex * this.size + this.size/2;
 	console.log(this.x +","+ this.y);
@@ -174,7 +172,11 @@ function Tower(game, xindex, yindex) {
 	this.attack = .1;
 	this.target = 0;
   this.animation = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
-                    0, 0, this.frameWidth, this.frameWidth, 1, 5, true, true);
+                      0, 0, 64, 64, 1, 3, false, false);
+
+  this.animation2 = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
+                                            0, 64 * 2, 64, 64, 1, 1, true, false);
+
 	//this.buildingAnimation
 	//this.attackAnimation
 
@@ -186,7 +188,8 @@ Tower.prototype.update = function() {
 
 	if (this.target != 0) { //Tower has target
  		this.target.healthbar.health -= this.attack;
-		if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx))^2) + (Math.abs((this.y - this.target.comy))^2)) > this.range) {
+		if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx))^2)
+     + (Math.abs((this.y - this.target.comy))^2)) > this.range) {
 			this.target = 0;
 		}
 	}
@@ -210,7 +213,15 @@ Tower.prototype.update = function() {
 
 Tower.prototype.draw = function(ctx) {
 	//ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
-  this.animation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
+  this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
+  var that = this;
+  setTimeout(function () {
+      that.d = 1;
+    }, 2000);
+  if(this.d == 1)  {
+    this.animation2.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
+  }
+
 	if (this.target != 0) {
 		ctx.beginPath();
 		ctx.moveTo(this.x, this.y);
