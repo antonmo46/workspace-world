@@ -11,7 +11,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
 
     this.totalTime = frameDuration * frames;
     this.elapsedTime = 0;
-	this.direction = 2;}
+  }
 Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     var scaleBy = scaleBy || 1.1;
     this.elapsedTime += tick;
@@ -32,10 +32,10 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     var locX = x;
     var locY = y;
     var offset = this.startY;
-    ctx.drawImage(this.spriteSheet, this.direction * this.frameWidth, index * this.frameHeight + offset,
-    			this.frameWidth, this.frameHeight,
-    			locX, locY, this.frameWidth * scaleBy,
-				this.frameHeight * scaleBy);}
+    ctx.drawImage(this.spriteSheet, this.startX, index * this.frameHeight + offset,
+          this.frameWidth, this.frameHeight,
+          locX, locY, this.frameWidth * scaleBy,
+        this.frameHeight * scaleBy);}
 Animation.prototype.currentFrame = function(){return Math.floor(this.elapsedTime / this.frameDuration);}
 Animation.prototype.isDone = function(){return (this.elapsedTime >= this.totalTime);}
 
@@ -173,6 +173,8 @@ function Tower(game, xindex, yindex) {
 	this.range = 15;
 	this.attack = .1;
 	this.target = 0;
+  this.animation = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
+                    0, 0, this.frameWidth, this.frameWidth, 1, 5, true, true);
 	//this.buildingAnimation
 	//this.attackAnimation
 
@@ -207,8 +209,8 @@ Tower.prototype.update = function() {
 }
 
 Tower.prototype.draw = function(ctx) {
-	ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
-
+	//ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
+  this.animation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
 	if (this.target != 0) {
 		ctx.beginPath();
 		ctx.moveTo(this.x, this.y);
@@ -221,14 +223,15 @@ Tower.prototype.draw = function(ctx) {
 function Grunt(){
     this.frameWidth = 76;
     this.frameHeight = 54;
+    this.direction = this.frameWidth * 2;
   this.x = 0;
   this.y = 300;
   this.comx = this.x + 35;
   this.comy = this.y + 28.5;
     this.healthbar = new Healthbar(150, 3, 20, 30);
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), 0, 0,
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), this.direction, 0,
      this.frameWidth, this.frameHeight, 0.1, 5, true, true);
-     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), 0, 272,
+     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), this.direction, 272,
       this.frameWidth, this.frameHeight, 0.1, 4, true, true);
     this.attacking = false;
     this.attack = .1;
@@ -236,6 +239,7 @@ function Grunt(){
     this.radius = 100;
     this.ground = 400;
 }
+
 
 Grunt.prototype.constructor = Grunt;
 Grunt.prototype.update = function(){
@@ -268,21 +272,23 @@ Grunt.prototype.draw = function(ctx){
 function Troll(){
     this.frameWidth = 62.4;
     this.frameHeight = 54;
+    this.direction = this.frameWidth * 2;
   this.x = 0;
   this.y = 300;
   this.comx = this.x + 31.2;
   this.comy = this.y + 27;
     this.healthbar = new Healthbar(150, 3, 20, 30);
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), 0, 0,
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), this.direction, 0,
      this.frameWidth, this.frameHeight, 0.1, 5, true, true);
-     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), 0, 337,
-      this.frameWidth, this.frameHeight, .1, 3, true, true);
+     this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), this.direction, 337,
+      this.frameWidth, this.frameHeight, 0.1, 3, true, true);
     this.attacking = false;
     this.attack = .1;
   this.speed = 2;
     this.radius = 100;
     this.ground = 400;
 }
+
 
 Troll.prototype.constructor = Troll;
 Troll.prototype.update = function(){
@@ -313,19 +319,20 @@ Troll.prototype.draw = function(ctx){
 
 /*################ OGRE ################*/
 function Ogre(){
-    this.frameWidth = 73;
-	this.x = 0;
-	this.y = 300;
-	this.comx = this.x + 36;
-	this.comy = this.y + 36;
-    this.healthbar = new Healthbar(150, 3, 20, 30);
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
-    this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), 0, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
-    this.attacking = false;
-    this.attack = .1;
-	this.speed = 2;
-    this.radius = 100;
-    this.ground = 400;
+  this.frameWidth = 73;
+  this.direction = this.frameWidth * 2;
+  this.x = 0;
+  this.y = 300;
+  this.comx = this.x + 36;
+  this.comy = this.y + 36;
+  this.healthbar = new Healthbar(150, 3, 20, 30);
+  this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
+  this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
+  this.attacking = false;
+  this.attack = .1;
+  this.speed = 2;
+  this.radius = 100;
+  this.ground = 400;
 }
 
 Ogre.prototype.constructor = Ogre;
@@ -423,13 +430,13 @@ GameBoard.prototype.update = function () {
 					score += 15;
 					buildmode = 0;
 					console.log(towers);
-				} 
+				}
 			}
 		} else if (matrixmap[cx][cy] == 1) {
 			showrange.flag = true;
 			showrange.x = cx;
 			showrange.y = cy;
-			
+
 		}
 	}
 
@@ -449,9 +456,9 @@ GameBoard.prototype.update = function () {
 		}
 	}
 	//Remove enemies that have been killed
-	
+
 	if (wavespawning) {
-			
+
 		var sum = 0;
 		for (var i = 0; i < 3; i++) {
 			sum += wavecount[i];
@@ -490,7 +497,7 @@ GameBoard.prototype.draw = function (ctx) {
 	for(var i = 0; i < enemies.length; i++) {
 		enemies[i].draw(ctx);
 	}
-	
+
 	if (showrange) {
 			ctx.save();
 			ctx.globalAlpha = 0.5;
@@ -532,6 +539,7 @@ ASSET_MANAGER.queueDownload("./img/ogre-2.png");
 ASSET_MANAGER.queueDownload("./img/grunt.png");
 ASSET_MANAGER.queueDownload("./img/troll.png");
 ASSET_MANAGER.queueDownload("./img/human-buildings.png");
+ASSET_MANAGER.queueDownload("./img/tower1.png");
 ASSET_MANAGER.queueDownload("./img/human-towers.png");
 ASSET_MANAGER.queueDownload("./img/terrain2.png");
 ASSET_MANAGER.queueDownload("./img/960px-Blank_Go_board.png");
