@@ -54,6 +54,14 @@ var towers = [];
 //Add global list of enemies
 var enemies = [];
 
+var showrange = {flag:false, x:-200, y:-200};
+
+var wavenumber = 0;
+var wavespawning = false;
+var wavecount = [4, 0, 0];
+var currentwave;
+var spawn;
+
 //Add global control
 var toolbar;
 var money = 300;
@@ -200,6 +208,7 @@ Tower.prototype.update = function() {
 
 Tower.prototype.draw = function(ctx) {
 	ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
+
 	if (this.target != 0) {
 		ctx.beginPath();
 		ctx.moveTo(this.x, this.y);
@@ -259,7 +268,7 @@ Grunt.prototype.draw = function(ctx){
 function Troll(){
     this.frameWidth = 62.4;
     this.frameHeight = 54;
-  this.x = 1200;
+  this.x = 0;
   this.y = 300;
   this.comx = this.x + 31.2;
   this.comy = this.y + 27;
@@ -382,7 +391,7 @@ function GameBoard(game) {
         matrixmap.push([]);
         for (var j = 0; j < this.gridheight; j++) {
 			if (j == 5) {
-				matrixmap[i].push(1);
+				matrixmap[i].push(-1);
 			} else {
 				matrixmap[i].push(0);
 			}
@@ -401,25 +410,28 @@ GameBoard.prototype.update = function () {
 	    var cy = Math.floor(this.game.click.y / 65);
     }
 
-    if (this.game.click && mx < this.gridwidth && my < this.gridheight && money >= 100) {
+    if (this.game.click && mx < this.gridwidth && my < this.gridheight) {
 		if (matrixmap[cx][cy] == 0) {
-			if (buildmode == 1) {
-				matrixmap[cx][cy] = 1;
-				towers.push(new Tower(this.game, cx, cy));
-				money -= 100;
-				score += 15;
-				buildmode = 0;
-				console.log(towers);
+			showrange.flag = false;
+			showrange.x = -200;
+			showrange.y = -200;
+			if(money >= 100) {
+				if (buildmode == 1) {
+					matrixmap[cx][cy] = 1;
+					towers.push(new Tower(this.game, cx, cy));
+					money -= 100;
+					score += 15;
+					buildmode = 0;
+					console.log(towers);
+				} 
 			}
+		} else if (matrixmap[cx][cy] == 1) {
+			showrange.flag = true;
+			showrange.x = cx;
+			showrange.y = cy;
+			
 		}
 	}
-    // if (this.game.click && this.game.mouse.x < this.gridwidth && this.game.mouse.y < this.gridheight && money >= 100) {
-        // matrixmap[this.game.click.x][this.game.click.y] = 1;
-        // towers.push(new Tower(this.game, this.game.click.x, this.game.click.y));
-        // money -= 100;
-        // score += 15;
-        // console.log(towers);
-    // }
 
 	//Update building
 	building.update();
@@ -437,17 +449,30 @@ GameBoard.prototype.update = function () {
 		}
 	}
 	//Remove enemies that have been killed
+	
+	if (wavespawning) {
+			
+		var sum = 0;
+		for (var i = 0; i < 3; i++) {
+			sum += wavecount[i];
+		}
+		if (sum == 0) {
+			wavespawning = false;
+		}
+	}
 
     Entity.prototype.update.call(this);
 }
 
 GameBoard.prototype.draw = function (ctx) {
+	//Draw background
+	background.draw(ctx);
 	//Draw grid
-	for (var i = 0; i < this.gridwidth; i++) {
+	for (var i = 0; i < this.gridwidth + 5; i++) {
 		for (var j = 0; j < this.gridheight; j++) {
             if(this.grid){
-              ctx.strokeStyle = "Red";
-            ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
+				ctx.strokeStyle = "Red";
+				ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
             }
 
 			// if (matrixmap[i][j] === 1) {
@@ -455,8 +480,6 @@ GameBoard.prototype.draw = function (ctx) {
 			// }
 		}
 	}
-	//Draw background
-	background.draw(ctx);
 	//Draw building
 	building.draw(ctx);
 	//Draw towers
@@ -466,6 +489,17 @@ GameBoard.prototype.draw = function (ctx) {
 	//Draw enemies
 	for(var i = 0; i < enemies.length; i++) {
 		enemies[i].draw(ctx);
+	}
+	
+	if (showrange) {
+			ctx.save();
+			ctx.globalAlpha = 0.5;
+			ctx.beginPath();
+			ctx.fillStyle = "gray";
+			ctx.arc(showrange.x * this.size + 32, showrange.y*this.size + 32, 150, 0, Math.PI * 2, false);
+			ctx.fill();
+			ctx.closePath();
+			ctx.restore;
 	}
     //Draw mouse shadow
     if (this.game.mouse) {
@@ -477,6 +511,11 @@ GameBoard.prototype.draw = function (ctx) {
         if(mx < this.gridwidth && my < this.gridheight){
 			if (matrixmap[mx][my] == 0 ) {
 				if (buildmode == 1) {
+					ctx.beginPath();
+					ctx.fillStyle = "gray";
+					ctx.arc(mx * this.size + 32, my*this.size + 32, 150, 0, Math.PI * 2, false);
+					ctx.fill();
+					ctx.closePath();
 					ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, mx * this.size, my * this.size, this.size, this.size);
 				}
 			}

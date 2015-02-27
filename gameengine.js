@@ -65,14 +65,21 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ') {
+			if(!wavespawning) {
+			wavespawning = true;
+			setInterval(function() {
+				var ogre = new Ogre();
+				enemies.push(ogre);
+			}, 1000);
+			}
 			//that.space = true;
-			var ogre = new Ogre();
-			enemies.push(ogre);
-			console.log(enemies);
+			// var ogre = new Ogre();
+			// enemies.push(ogre);
+			// console.log(enemies);
 		}else if (String.fromCharCode(e.which) === '2') {
       var grunt = new Grunt();
       enemies.push(grunt);
-      console.log(enemies);
+      //2console.log(enemies);
     }
     else if (String.fromCharCode(e.which) === '3') {
       var troll = new Troll();
