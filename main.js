@@ -164,28 +164,23 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.d = 0;
         this.xindex = xindex;
         this.yindex = yindex;
-        this.size = 64;
+        this.size = 65;
         this.x = xindex * this.size + this.size/2;
         this.y = yindex * this.size + this.size/2;
         console.log(this.x +","+ this.y);
         this.range = 15;
         this.attack = .1;
         this.target = 0;
-        this.animation = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
-        0, 0, 64, 64, 1, 3, false, false);
+        // this.animation = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
+        // 0, 0, 64, 64, 1, 3, false, false);
 
-        this.animation2 = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
-        0, 64 * 2, 64, 64, 1, 1, true, false);
-
-        //this.buildingAnimation
-        //this.attackAnimation
-
+        // this.animation2 = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
+        // 0, 64 * 2, 64, 64, 1, 1, true, false);
       }
 
       Tower.prototype = new Entity();
       Tower.prototype.constructor = Tower;
       Tower.prototype.update = function() {
-
         if (this.target != 0) { //Tower has target
           this.target.healthbar.health -= this.attack;
           if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx))^2)
@@ -207,20 +202,19 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
             }
           }
           this.target = newtarget;
-
         }
       }
 
       Tower.prototype.draw = function(ctx) {
-        //ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
-        this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
-        var that = this;
-        setTimeout(function () {
-          that.d = 1;
-        }, 2000);
-        if(this.d == 1)  {
-          this.animation2.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
-        }
+        ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
+        // this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
+        // var that = this;
+        // setTimeout(function () {
+          // that.d = 1;
+        // }, 2000);
+        // if(this.d == 1)  {
+          // this.animation2.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
+        // }
 
         if (this.target != 0) {
           ctx.beginPath();
@@ -230,6 +224,58 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         }
       }
 
+	  /*############## AOE TOWER #############*/
+	  function AOETower(game, xindex, yindex) {
+        this.d = 0;
+        this.xindex = xindex;
+        this.yindex = yindex;
+        this.size = 65;
+        this.x = xindex * this.size + this.size/2;
+        this.y = yindex * this.size + this.size/2;
+		this.animation = new Animation(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.x, this.y, this.size, this.size);
+        console.log(this.x +","+ this.y);
+        this.range = 15;
+        this.attack = .03;
+        this.target = [];
+
+      }
+
+      AOETower.prototype = new Entity();
+      AOETower.prototype.constructor = AOETower;
+      AOETower.prototype.update = function() {
+          for (var i = 0; i < enemies.length; i++) {
+            if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
+				enemies[i].healthbar.health -= this.attack;
+            }
+          }
+      }
+
+      AOETower.prototype.draw = function(ctx) {
+        ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
+        //this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
+        // var that = this;
+        // setTimeout(function () {
+          // that.d = 1;
+        // }, 2000);
+        // if(this.d == 1)  {
+          // this.animation2.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
+        // }
+
+        for (var i = 0; i < enemies.length; i++) {
+            if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
+				ctx.beginPath();
+				ctx.fillStyle = "red";
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(enemies[i].comx, enemies[i].comy);
+				ctx.stroke();
+            }
+          }
+      }
+
+	  
+	  
+	  
+	  
       /*################ GRUNT ################*/
       function Grunt(){
         this.frameWidth = 76;
@@ -239,14 +285,15 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.y = 300;
         this.comx = this.x + 35;
         this.comy = this.y + 28.5;
-        this.healthbar = new Healthbar(100, 3, 20, 30);
+        this.healthbar = new Healthbar(100, 3, 20, 20);
         this.animation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), this.direction, 0,
         this.frameWidth, this.frameHeight, 0.1, 5, true, true);
         this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), this.direction, 272,
         this.frameWidth, this.frameHeight, 0.1, 4, true, true);
         this.attacking = false;
-        this.attack = .1;
-        this.speed = 2;
+		this.bounty = 25;
+        this.attack = .05;
+        this.speed = 2.5;
         this.radius = 100;
         this.ground = 400;
       }
@@ -254,7 +301,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 
       Grunt.prototype.constructor = Grunt;
       Grunt.prototype.update = function(){
-        if (this.x === 1410){
+        if (this.x >= 1410){
           this.attacking = true;
         } else {
           this.x += this.speed;
@@ -294,8 +341,9 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), this.direction, 337,
         this.frameWidth, this.frameHeight, 0.1, 3, true, true);
         this.attacking = false;
-        this.attack = .1;
-        this.speed = 2;
+		this.bounty = 35;
+        this.attack = .05;
+        this.speed = 1.82;
         this.radius = 100;
         this.ground = 400;
       }
@@ -303,7 +351,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 
       Troll.prototype.constructor = Troll;
       Troll.prototype.update = function(){
-        if (this.x === 1410){
+        if (this.x >= 1410){
           this.attacking = true;
         } else {
           this.x += this.speed;
@@ -336,20 +384,21 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.y = 300;
         this.comx = this.x + 36;
         this.comy = this.y + 36;
-        this.healthbar = new Healthbar(150, 3, 20, 30);
+        this.healthbar = new Healthbar(150, 3, 20, 60);
         this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
         this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
         this.dieAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), (73 * 9), 0, this.frameWidth, this.frameWidth, 1, 5, true, true);
         this.attacking = false;
         this.attack = .1;
-        this.speed = 2;
+        this.speed = 1;
+		this.bounty = 50;
         this.radius = 100;
         this.ground = 400;
       }
 
       Ogre.prototype.constructor = Ogre;
       Ogre.prototype.update = function(){
-        if (this.x === 1410){
+        if (this.x >= 1410){
           this.attacking = true;
         } else {
           this.x += this.speed;
@@ -404,7 +453,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
       /*############## Board #############*/
       function GameBoard(game) {
         Entity.call(this, game, 20, 20);
-        this.grid = true; //Sets if grid is visible or not.
+        this.grid = false; //Sets if grid is visible or not.
         matrixmap = [];
         // Adjust these 3 variables to change grid size.
         this.gridwidth = 22;
@@ -448,6 +497,16 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
                   console.log(towers);
                 }
               }
+			  if(money >= 250) {
+                if (buildmode == 2) {
+                  matrixmap[cx][cy] = 2;
+                  towers.push(new AOETower(this.game, cx, cy));
+                  money -= 250;
+                  score += 15;
+                  buildmode = 0;
+                  console.log(towers);
+                }
+              }
             } else if (matrixmap[cx][cy] == 1) {
               showrange.flag = true;
               showrange.x = cx;
@@ -466,7 +525,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           for(var i = 0; i < enemies.length; i++) {
             enemies[i].update();
             if (enemies[i].healthbar.health <= 0) {
-              money += 100;
+              money += enemies[i].bounty;
               score += 30;
               enemies.splice(i,1);
             }
@@ -540,6 +599,13 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
                   ctx.fill();
                   ctx.closePath();
                   ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size, mx * this.size, my * this.size, this.size, this.size);
+                } else if (buildmode == 2) {
+                  ctx.beginPath();
+                  ctx.fillStyle = "gray";
+                  ctx.arc(mx * this.size + 32, my*this.size + 32, 150, 0, Math.PI * 2, false);
+                  ctx.fill();
+                  ctx.closePath();
+                  ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, mx * this.size, my * this.size, this.size, this.size);
                 }
               }
             }

@@ -53,11 +53,13 @@ GameEngine.prototype.init = function (ctx) {
 }
 
 GameEngine.prototype.start = function () {
-  console.log("starting game");
-  var that = this;
-  (function gameLoop() {
-    that.loop();
-    requestAnimFrame(gameLoop, that.ctx.canvas);
+	var audio = new Audio('sound/Game of Thrones.mp3');
+	audio.play();
+	console.log("starting game");
+	var that = this;
+	(function gameLoop() {
+		that.loop();
+		requestAnimFrame(gameLoop, that.ctx.canvas);
   })();
 }
 
@@ -112,20 +114,23 @@ GameEngine.prototype.startInput = function () {
       // var ogre = new Ogre();
       // enemies.push(ogre);
       // console.log(enemies);
-    }else if (String.fromCharCode(e.which) === '2') {
+    }else if (String.fromCharCode(e.which) === 'g') {
       var grunt = new Grunt();
       enemies.push(grunt);
       //2console.log(enemies);
     }
-    else if (String.fromCharCode(e.which) === '3') {
+    else if (String.fromCharCode(e.which) === 't') {
       var troll = new Troll();
       enemies.push(troll);
       console.log(enemies);
-    }
-    else if (String.fromCharCode(e.which) === '1') {
+    } else if (String.fromCharCode(e.which) === '1') {
       if (money >= 100) {
         buildmode = 1;
       }
+    } else if (String.fromCharCode(e.which) === '2') {
+      if (money >= 250) {
+        buildmode = 2;
+    }
       // that.direction = (that.direction + 1) % 8; // right key
       // that.directionChanged = true;
       // }
