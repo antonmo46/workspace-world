@@ -103,6 +103,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     Background.prototype.update = function(){}
     Background.prototype.draw = function(ctx){
       ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
+	  ctx.drawImage(ASSET_MANAGER.getAsset("./img/scroll.png"),1515,-100);
     }
 
     /*################ Toolbar Box ################*/
@@ -126,34 +127,55 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         if(this.game.click){
           this.cx = this.game.click.x;
           this.cy = this.game.click.y;
-          if(this.cx > this.lx && this.cx < this.lx + (this.w * 3) + 1){
-            buildmode = (this.lx + (this.w * 3) - this.cx + 3) % 3;
+          if(this.cx >= this.lx && this.cx <= this.lx + 65
+			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65) {
+			if (money >= 100) {
+				buildmode = 1;
+			}
+          }
+		 if(this.cx >= this.lx +65 && this.cx <= this.lx + 65+65
+			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
+			if (money >= 250) {
+				buildmode = 2;
+			}
           }
         }
       }
       Toolbar.prototype.draw = function(ctx){
-        for(var i = 0; i < 3; i++) {
-          ctx.strokeStyle = this.color;
-          ctx.strokeRect(this.lx + this.w * i + i, this.ly, this.w, this.h);
-        }
-        ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),6,251,  this.w,this.h,this.lx + this.scalex * 0 + 0,this.ly,this.scalex,this.scaley);
-        ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),251,292,this.w,this.h,this.lx + this.scalex * 1 + 1,this.ly,this.scalex,this.scaley);
-        ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),300,292,this.w,this.h,this.lx + this.scalex * 2 + 2,this.ly,this.scalex,this.scaley);
-        ctx.fillStyle = "#FF0000";
-        ctx.font = "14px sans-serif"
-        ctx.fillText  ("Money: " + money, this.lx, 80);
-        ctx.fillText  ("Score: " + score, this.lx, 100);
-        ctx.fillText  ("Time: " + parseInt(gameEngine.timer.gameTime,10) + " sec(s)", this.lx, 120);
+        //ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),6,251,  this.w,this.h,this.lx + this.scalex * 0 + 0,this.ly + 75,this.scalex,this.scaley);
+        //ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),251,292,this.w,this.h,this.lx + this.scalex * 1 + 4,this.ly + 75,this.scalex,this.scaley);
+		//ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65 * 1 + 4,this.ly + 75, 65, 65);
+		ctx.font = "22px sans-serif";
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65,this.lx,this.ly + 70, 65, 65);
+		ctx.fillText  ("$100", this.lx+10, this.ly+150);
+		if (buildmode === 1) {
+			ctx.strokeStyle = this.color;
+			ctx.strokeRect(this.lx, this.ly+70, 65, 65);
+		}
+		
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65,this.ly + 70, 65, 65);
+		ctx.fillText  ("$250", this.lx+75, this.ly+150);
+		if (buildmode === 2) {
+			ctx.strokeStyle = this.color;
+			ctx.strokeRect(this.lx + 65, this.ly+70, 65, 65);
+		}
+       // ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),300,292,this.w,this.h,this.lx + this.scalex * 2 + 8,this.ly + 75,this.scalex,this.scaley);
+        ctx.fillStyle = "#000000";
+        ctx.font = "22px sans-serif";
+		var text = 200;
+        ctx.fillText  ("Money: " + money, this.lx, text);
+        ctx.fillText  ("Score: " + score, this.lx, text + 20);
+        ctx.fillText  ("Time: " + parseInt(gameEngine.timer.gameTime,10) + " sec(s)", this.lx, text + 40);
         if(gameEngine.gameover === 1){
-          ctx.fillText  ("GameOver:", this.lx, 140);
+          ctx.fillText  ("GameOver:", this.lx, 1800);
         }
         //if(cx === 0 || !cx){
         //var cx = this.game.click?this.game.click.x:0
         //var cy = this.game.click?this.game.click.y:0
         // }
-        ctx.fillText  ("Buildmode: " + buildmode, this.lx, 160);
-        ctx.fillText  ("cx: " + this.cx, this.lx, 180);
-        ctx.fillText  ("cy: " + this.cy, this.lx, 200);
+        //ctx.fillText  ("Buildmode: " + buildmode, this.lx, text + 60);
+        //ctx.fillText  ("cx: " + this.cx, this.lx, text + 80);
+        //ctx.fillText  ("cy: " + this.cy, this.lx, text + 100);
 
       }
 
@@ -549,6 +571,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         GameBoard.prototype.draw = function (ctx) {
           //Draw background
           background.draw(ctx);
+		  toolbar.draw(ctx);
           //Draw grid
           for (var i = 0; i < this.gridwidth + 5; i++) {
             for (var j = 0; j < this.gridheight; j++) {
@@ -624,6 +647,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         ASSET_MANAGER.queueDownload("./img/tower1.png");
         ASSET_MANAGER.queueDownload("./img/human-towers.png");
         ASSET_MANAGER.queueDownload("./img/terrain2.png");
+		ASSET_MANAGER.queueDownload("./img/scroll.png");
 
 
 
