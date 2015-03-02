@@ -147,13 +147,24 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		//ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65 * 1 + 4,this.ly + 75, 65, 65);
 		ctx.font = "22px sans-serif";
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65,this.lx,this.ly + 70, 65, 65);
+		if (money >= 100) {
+			ctx.fillStyle = "#00ff00";
+		} else {
+			ctx.fillStyle = "#000000";
+		}
 		ctx.fillText  ("$100", this.lx+10, this.ly+150);
 		if (buildmode === 1) {
 			ctx.strokeStyle = this.color;
 			ctx.strokeRect(this.lx, this.ly+70, 65, 65);
+			
 		}
 		
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65,this.ly + 70, 65, 65);
+		if (money >= 250) {
+			ctx.fillStyle = "#00ff00";
+		} else {
+			ctx.fillStyle = "#000000";
+		}
 		ctx.fillText  ("$250", this.lx+75, this.ly+150);
 		if (buildmode === 2) {
 			ctx.strokeStyle = this.color;
