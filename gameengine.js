@@ -125,22 +125,18 @@ GameEngine.prototype.startInput = function () {
       enemies.push(troll);
       console.log(enemies);
     } else if (String.fromCharCode(e.which) === '1') {
-      if (money >= 100) {
-        buildmode = 1;
-      }
+		if (money >= 100) {
+			buildmode = 1;
+		}
     } else if (String.fromCharCode(e.which) === '2') {
-      if (money >= 250) {
-        buildmode = 2;
-    }
-      // that.direction = (that.direction + 1) % 8; // right key
-      // that.directionChanged = true;
-      // }
-      // else if (String.fromCharCode(e.which) === '%'){
-      // that.direction = (that.direction - 1) % 8;	// left key
-      // if (that.direction < 0) that.direction += 8;
-      // that.directionChanged = true;
-      // }
-    }else if (e.which === 27) {
+		if (money >= 250) {
+			buildmode = 2;
+		}
+    } else if (String.fromCharCode(e.which) === '3') {
+		if (money >= 150) {
+			buildmode = 3;
+		}
+    } else if (e.which === 27) {
       that.gameover = that.gameover === 1 ? 0 : 1;
       console.log('gameover=' + that.gameover);
     }

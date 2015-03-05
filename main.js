@@ -139,6 +139,12 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 				buildmode = 2;
 			}
           }
+		  if(this.cx >= this.lx +65+65 && this.cx <= this.lx + 65+65+65
+			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
+			if (money >= 150) {
+				buildmode = 3;
+			}
+          }
         }
       }
       Toolbar.prototype.draw = function(ctx){
@@ -170,6 +176,20 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			ctx.strokeStyle = this.color;
 			ctx.strokeRect(this.lx + 65, this.ly+70, 65, 65);
 		}
+		
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405,265,95,95, this.lx + 65+65,this.ly + 70, 65, 65);
+		if (money >= 150) {
+			ctx.fillStyle = "#00ff00";
+		} else {
+			ctx.fillStyle = "#000000";
+		}
+		ctx.fillText  ("$150", this.lx+75+65, this.ly+150);
+		if (buildmode === 3) {
+			ctx.strokeStyle = this.color;
+			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
+		}
+		
+		
        // ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),300,292,this.w,this.h,this.lx + this.scalex * 2 + 8,this.ly + 75,this.scalex,this.scaley);
         ctx.fillStyle = "#000000";
         ctx.font = "22px sans-serif";
@@ -251,6 +271,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 
         if (this.target != 0) {
           ctx.beginPath();
+		  ctx.strokeStyle = "#00FF00";
           ctx.moveTo(this.x, this.y);
           ctx.lineTo(this.target.comx, this.target.comy);
           ctx.stroke();
@@ -297,7 +318,55 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         for (var i = 0; i < enemies.length; i++) {
             if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
 				ctx.beginPath();
-				ctx.fillStyle = "red";
+				ctx.strokeStyle = "red";
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(enemies[i].comx, enemies[i].comy);
+				ctx.stroke();
+            }
+          }
+      }
+	  
+	  	  /*############## SLOW TOWER #############*/
+	  function SlowTower(game, xindex, yindex) {
+        this.d = 0;
+        this.xindex = xindex;
+        this.yindex = yindex;
+        this.size = 65;
+        this.x = xindex * this.size + this.size/2;
+        this.y = yindex * this.size + this.size/2;
+		this.animation = new Animation(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.x, this.y, this.size, this.size);
+        console.log(this.x +","+ this.y);
+        this.range = 15;
+        this.attack = .03;
+        this.targets = [];
+
+      }
+
+      SlowTower.prototype = new Entity();
+      SlowTower.prototype.constructor = AOETower;
+      SlowTower.prototype.update = function() {
+		for (var i = 0; i < enemies.length; i++) {
+			if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
+				this.targets.push(enemies[i]);
+			}
+          }
+		  
+		for (var i = 0; i < this.targets.length; i++) {
+			if (Math.sqrt((Math.abs((this.x - this.targets[i].comx))^2) + (Math.abs((this.y - this.targets[i].comy))^2)) <= this.range) {
+				this.targets[i].slowed =true;
+			} else {
+				this.targets[i].slowed =false;
+				this.targets.splice(i,1);
+			}
+		}
+      }
+
+      SlowTower.prototype.draw = function(ctx) {
+        ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405,265,95,95, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
+        for (var i = 0; i < enemies.length; i++) {
+            if (Math.sqrt((Math.abs((this.x - enemies[i].comx))^2) + (Math.abs((this.y - enemies[i].comy))^2)) <= this.range) {
+				ctx.beginPath();
+				ctx.strokeStyle = "blue";
 				ctx.moveTo(this.x, this.y);
 				ctx.lineTo(enemies[i].comx, enemies[i].comy);
 				ctx.stroke();
@@ -307,8 +376,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 
 	  
 	  
-	  
-	  
+	    
       /*################ GRUNT ################*/
       function Grunt(){
         this.frameWidth = 76;
@@ -329,17 +397,22 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.speed = 2.5;
         this.radius = 100;
         this.ground = 400;
+		this.slowed = false;
       }
 
 
       Grunt.prototype.constructor = Grunt;
       Grunt.prototype.update = function(){
         if (this.x >= 1410){
-          this.attacking = true;
+			this.attacking = true;
         } else {
-          this.x += this.speed;
-          this.comx = this.x + 35;
-          this.comy = this.y + 28.5;
+			if (this.slowed) {
+				this.x += this.speed/2;
+			} else {
+				this.x += this.speed;
+			}
+			this.comx = this.x + 35;
+			this.comy = this.y + 28.5;
         }
         this.healthbar.update();
       }
@@ -379,6 +452,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.speed = 1.82;
         this.radius = 100;
         this.ground = 400;
+		this.slowed = false;
       }
 
 
@@ -387,7 +461,11 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         if (this.x >= 1410){
           this.attacking = true;
         } else {
-          this.x += this.speed;
+          	if (this.slowed) {
+				this.x += this.speed/2;
+			} else {
+				this.x += this.speed;
+			}
           this.comx = this.x + 31.2;
           this.comy = this.y + 27;
         }
@@ -427,6 +505,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		this.bounty = 50;
         this.radius = 100;
         this.ground = 400;
+		this.slowed = false;
       }
 
       Ogre.prototype.constructor = Ogre;
@@ -434,7 +513,11 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         if (this.x >= 1410){
           this.attacking = true;
         } else {
-          this.x += this.speed;
+          	if (this.slowed) {
+				this.x += this.speed/2;
+			} else {
+				this.x += this.speed;
+			}
           this.comx = this.x + 36;
           this.comy = this.y + 36;
         }
@@ -540,6 +623,16 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
                   console.log(towers);
                 }
               }
+			  if(money >= 150) {
+                if (buildmode == 3) {
+                  matrixmap[cx][cy] = 3;
+                  towers.push(new SlowTower(this.game, cx, cy));
+                  money -= 150;
+                  score += 15;
+                  buildmode = 0;
+                  console.log(towers);
+                }
+              }
             } else if (matrixmap[cx][cy] == 1) {
               showrange.flag = true;
               showrange.x = cx;
@@ -590,10 +683,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
                 ctx.strokeStyle = "Red";
                 ctx.strokeRect(i * this.size, j * this.size, this.size, this.size);
               }
-
-              // if (matrixmap[i][j] === 1) {
-              // ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,i * this.size, j * this.size, this.size, this.size);
-              // }
             }
           }
           //Draw building
@@ -640,6 +729,13 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
                   ctx.fill();
                   ctx.closePath();
                   ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, mx * this.size, my * this.size, this.size, this.size);
+                } else if (buildmode == 3) {
+                  ctx.beginPath();
+                  ctx.fillStyle = "gray";
+                  ctx.arc(mx * this.size + 32, my*this.size + 32, 150, 0, Math.PI * 2, false);
+                  ctx.fill();
+                  ctx.closePath();
+				  ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405,265,95,95, mx * this.size, my * this.size, this.size, this.size);
                 }
               }
             }
