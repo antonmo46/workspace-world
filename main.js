@@ -50,8 +50,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
     var towers = [];
     //List of enemies currently on the map
     var enemies = [];
-	//Used to draw range circle on tower click
-    var showrange = {flag:false, x:-200, y:-200};
     //Control panel for player
     var toolbar;
 	//Money to buy towers and abilities
@@ -597,44 +595,36 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 
           if (this.game.click && mx < this.gridwidth && my < this.gridheight) {
             if (matrixmap[cx][cy] == 0) {
-              showrange.flag = false;
-              showrange.x = -200;
-              showrange.y = -200;
-              if(money >= 100) {
+              if(money >= cost[0]) {
                 if (buildmode == 1) {
                   matrixmap[cx][cy] = 1;
                   towers.push(new Tower(this.game, cx, cy));
-                  money -= 100;
+                  money -= cost[0];
                   score += 15;
                   buildmode = 0;
                   console.log(towers);
                 }
               }
-			  if(money >= 250) {
+			  if(money >= cost[1]) {
                 if (buildmode == 2) {
                   matrixmap[cx][cy] = 2;
                   towers.push(new AOETower(this.game, cx, cy));
-                  money -= 250;
+                  money -= cost[1];
                   score += 15;
                   buildmode = 0;
                   console.log(towers);
                 }
               }
-			  if(money >= 150) {
+			  if(money >= cost[2]) {
                 if (buildmode == 3) {
                   matrixmap[cx][cy] = 3;
                   towers.push(new SlowTower(this.game, cx, cy));
-                  money -= 150;
+                  money -= cost[2];
                   score += 15;
                   buildmode = 0;
                   console.log(towers);
                 }
               }
-            } else if (matrixmap[cx][cy] == 1) {
-              showrange.flag = true;
-              showrange.x = cx;
-              showrange.y = cy;
-
             }
           }
 
@@ -679,18 +669,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           for(var i = 0; i < enemies.length; i++) {
             enemies[i].draw(ctx);
           }
-
-          if (showrange) {
-            ctx.save();
-            ctx.globalAlpha = 0.5;
-            ctx.beginPath();
-            ctx.fillStyle = "gray";
-            ctx.arc(showrange.x * this.size + 32, showrange.y*this.size + 32, 150, 0, Math.PI * 2, false);
-            ctx.fill();
-            ctx.closePath();
-            ctx.restore;
-          }
-          //Draw mouse shadow
+          //Draw tower shadow
           if (this.game.mouse) {
             var mx = Math.floor(this.game.mouse.x / 65);
             var my = Math.floor(this.game.mouse.y / 65);
