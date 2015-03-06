@@ -151,7 +151,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           }
         }
     }
-      Toolbar.prototype.draw = function(ctx){
+    Toolbar.prototype.draw = function(ctx){
 		if (this.game.mouse) {
 			var mx = this.game.mouse.x;
 			var my = this.game.mouse.y;
@@ -183,7 +183,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		}
 
 		// Draws a button for a special ability including tooltip
-		function abilitybutton(ctx, image, x,y, cost) {
+		function abilitybutton(ctx, image, x, y, name, cost) {
 			ctx.drawImage(ASSET_MANAGER.getAsset(image), 0,0,64,64, x,y, 65, 65);
 			if (money >= cost) {
 				ctx.fillStyle = "#00ff00";
@@ -192,7 +192,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			}
 			ctx.fillText  ("$"+cost, x+75, y+50);
 			ctx.fillStyle = "#000000";
-			ctx.fillText  ("Fire Wave", x+75, y+20);
+			ctx.fillText  (name, x+75, y+20);
 			ctx.drawImage(ASSET_MANAGER.getAsset("./img/tooltip.png"), 0,0,16,16,x-10,y, 16, 16);
 			
 			var backcolor = "#222222";
@@ -221,10 +221,10 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         }
 		
 		//Ability buttons
-		abilitybutton(ctx, "./img/firewave.png", 	 this.lx, this.ly+300, cost[3]);
-		abilitybutton(ctx, "./img/buildingheal.png", this.lx, this.ly+375, cost[4]);
-		//abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, cost[5]);
-      }
+		abilitybutton(ctx, "./img/firewave.png", 	 this.lx, this.ly+300, "Fire Wave",  cost[3]);
+		abilitybutton(ctx, "./img/buildingheal.png", this.lx, this.ly+375, "Heal", 		 cost[4]);
+		//abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, "Mage",       cost[5]);
+    }
 
       /*################ TOWER ###############*/
       function Tower(game, xindex, yindex) {
