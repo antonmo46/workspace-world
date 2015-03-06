@@ -38,193 +38,180 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 
     /*########### GLOBAL DATA STRUCTURES ##################*/
     var gameEngine;
-
+	
     var gameboard;
     //Background
     var background;
-    //Add global matrix for grid states
+    //Matrix to keep track of where towers can be built
     var matrixmap = [];
-    //Add global building
+    //Building to be defended
     var building;
-    //Add global list of towers
+    //List of towers currently on the map
     var towers = [];
-    //Add global list of enemies
+    //List of enemies currently on the map
     var enemies = [];
-
+	//Used to draw range circle on tower click
     var showrange = {flag:false, x:-200, y:-200};
-
-    var wavenumber = 0;
-    var wavespawning = false;
-    var wavecount = [4, 0, 0];
-    var currentwave;
-    var spawn;
-
-    //Add global control
+    //Control panel for player
     var toolbar;
+	//Money to buy towers and abilities
     var money = 300;
+	//Game score
     var score = 0;
+	//Determines which tower is currently being built: 0=none, 1=NORMAL, 2=AOE, 3=SLOW
     var buildmode = 0;
+	//Cost of towers and abilities (makes it easier to change)
+	//			norm, aoe, slow, fire, heal, mage
+	var cost = [100,  250, 150,  200,  200,  300];
 
     /*################ BUILDINGS ################*/
     function Building(game){
-      this.xpos = 1455;
-      this.ypos = 280;
-      this.width = 125
-      this.healthbar = new Healthbar(95,4,10, 100);
-      Entity.call(this, game, 0, 0);
+		this.xpos = 1455;
+		this.ypos = 280;
+		this.width = 125
+		this.healthbar = new Healthbar(95,4,10, 100);
     }
-    //Building.prototype = new Entity();
     Building.prototype.constructor = Building;
-
     Building.prototype.update = function(){
-      if(this.healthbar.health <= 0){
-        gameEngine.gameover = 1;
-      }
-      this.healthbar.update();
-      //Entity.prototype.update.call(this);
+		if(this.healthbar.health <= 0){
+			gameEngine.gameover = 1;
+		}
+		this.healthbar.update();
     }
-
     Building.prototype.draw = function(ctx){
-      var framex = 267;
-      var framey = 0;
-      var width = 125;
-      var scale = width * 1;
-
-      ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), framex, framey, width,width, this.xpos, this.ypos, scale, scale);
-      this.healthbar.draw(this.xpos, this.ypos, ctx);
-
-      //Entity.prototype.draw.call(this);
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 267, 0, 125,125, this.xpos, this.ypos, 125, 125);
+		this.healthbar.draw(this.xpos, this.ypos, ctx);
     }
 
     /*################ Background ################*/
     function Background(game){Entity.call(this, game, 0, 0);}
-    //Background.prototype = new Entity();
     Background.prototype.constructor = Background;
     Background.prototype.update = function(){}
     Background.prototype.draw = function(ctx){
-      ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
-	  ctx.drawImage(ASSET_MANAGER.getAsset("./img/scroll.png"),1515,-100);
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/terrain2.png"),0,0);
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/scroll.png"),1515,-100);
     }
 
     /*################ Toolbar Box ################*/
     function Toolbar(game){
-      this.w = 46;
-      this.h = 38;
-      this.lx = 1600;
-      this.ly = 50;
-      this.scalex = this.w * 1;
-      this.scaley = this.h * 1;
-      this.color = "Chartreuse";
+		this.lx = 1600;
+		this.ly = 50;
 
-      this.cx = 0;
-      this.cy = 0;
+		this.cx = 0;
+		this.cy = 0;
 
-
-
-      Entity.call(this, game, 0, 0);}
-      Toolbar.prototype.constructor = Toolbar;
-      Toolbar.prototype.update = function(){
+		Entity.call(this, game, 0, 0);
+	}
+    Toolbar.prototype.constructor = Toolbar;
+    Toolbar.prototype.update = function(){
         if(this.game.click){
           this.cx = this.game.click.x;
           this.cy = this.game.click.y;
 		  //normal tower button
-          if(this.cx >= this.lx && this.cx <= this.lx + 65
-			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65) {
-			if (money >= 100) {
+          if(this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly +70 && this.cy <= this.ly+70+65) {
+			if (money >= cost[0]) {
 				buildmode = 1;
 			}
           }
 		  //AOE tower button
-		 if(this.cx >= this.lx +65 && this.cx <= this.lx + 65+65
-			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
-			if (money >= 250) {
+		 if(this.cx >= this.lx +65 && this.cx <= this.lx + 65+65 && this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
+			if (money >= cost[1]) {
 				buildmode = 2;
 			}
           }
 		  //Slow tower button
-		  if(this.cx >= this.lx +65+65 && this.cx <= this.lx + 65+65+65
-			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
-			if (money >= 150) {
+		  if(this.cx >= this.lx +65+65 && this.cx <= this.lx + 65+65+65 && this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
+			if (money >= cost[2]) {
 				buildmode = 3;
 			}
           }
-		  //Fire Wave button this.lx, this.ly + 300
-		  if(this.cx >= this.lx && this.cx <= this.lx + 65
-			&& this.cy >= this.ly +300 && this.cy <= this.ly+300+65)		 {
-			if (money >= 200) {
-				money -= 200;
+		  //Fire Wave button
+		  if(this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly +300 && this.cy <= this.ly+300+65)		 {
+			if (money >= cost[3]) {
+				money -= cost[3];
 				for(var i = 0; i < enemies.length; i++) {
 					enemies[i].healthbar.health = enemies[i].healthbar.health/2; 
 				}
 			}
           }
-		  //Building Heal button this.lx,this.ly + 375, 65, 65
-		  if(this.cx >= this.lx && this.cx <= this.lx + 65
-			&& this.cy >= this.ly +375 && this.cy <= this.ly+375+65)		 {
-			if (money >= 200) {
-				money -= 200;
+		  //Building Heal button 
+		  if(this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly +375 && this.cy <= this.ly+375+65)		 {
+			if (money >= cost[4]) {
+				money -= cost[4];
 				building.healthbar.health += 50;
 				if(building.healthbar.health > 100) {
 					building.healthbar.health = 100;
 				}
 			}
-          }
-		  
-		  //Spawn Mage button this.lx,this.ly + 450
-		  if(this.cx >= this.lx && this.cx <= this.lx + 65
-			&& this.cy >= this.ly +450 && this.cy <= this.ly+450+65)		 {
-			if (money >= 300) {
-				money -= 300;
+          }  
+		  //Spawn Mage button 
+		  if(this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly +450 && this.cy <= this.ly+450+65)		 {
+			if (money >= cost[5]) {
+				//money -= cost[5];
 				//SPAWN MAGE
 			}
           }
         }
-      }
+    }
       Toolbar.prototype.draw = function(ctx){
-        // -----------TOWER CONTROLS--------------
-		ctx.font = "22px sans-serif";
-		// NORMAL TOWER
-		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65,this.lx,this.ly + 70, 65, 65);
-		if (money >= 100) {
-			ctx.fillStyle = "#00ff00";
-		} else {
-			ctx.fillStyle = "#000000";
+		if (this.game.mouse) {
+			var mx = this.game.mouse.x;
+			var my = this.game.mouse.y;
 		}
-		ctx.fillText  ("$100", this.lx+10, this.ly+150);
-		if (buildmode === 1) {
-			ctx.strokeStyle = this.color;
-			ctx.strokeRect(this.lx, this.ly+70, 65, 65);
+		
+		// Draws a build button for a tower including tooltip
+		function towerbutton(ctx, image, x, y, framex, framey, size, cost, buildnum) {
+			ctx.font = "22px sans-serif";
+			ctx.drawImage(ASSET_MANAGER.getAsset(image), framex,framey,size,size,x,y, 65, 65);
+			if (money >= cost) {
+				ctx.fillStyle = "#00ff00";
+			} else {
+				ctx.fillStyle = "#000000";
+			}
+			ctx.fillText  ("$"+cost, x+10, y+80);
+			if (buildmode === buildnum) {
+				ctx.strokeStyle = "#00ff00";
+				ctx.strokeRect(x, y, 65, 65);
+			}
+			ctx.drawImage(ASSET_MANAGER.getAsset("./img/tooltip.png"), 0,0,16,16,x,y, 16, 16);
 			
+			var backcolor = "#222222";
+			//Normal tower
+			if (mx >= x && mx <= x + 16 && my >= y && my <= y + 16) {
+				ctx.fillStyle = backcolor;
+				ctx.fillRect(1585, y-50, 200, 50);
+				//*************Make images for tower tooltips**************************
+			}
 		}
-		
-		//AOE TOWER
-		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65,this.ly + 70, 65, 65);
-		if (money >= 250) {
-			ctx.fillStyle = "#00ff00";
-		} else {
+
+		// Draws a button for a special ability including tooltip
+		function abilitybutton(ctx, image, x,y, cost) {
+			ctx.drawImage(ASSET_MANAGER.getAsset(image), 0,0,64,64, x,y, 65, 65);
+			if (money >= cost) {
+				ctx.fillStyle = "#00ff00";
+			} else {
+				ctx.fillStyle = "#000000";
+			}
+			ctx.fillText  ("$"+cost, x+75, y+50);
 			ctx.fillStyle = "#000000";
-		}
-		ctx.fillText  ("$250", this.lx+75, this.ly+150);
-		if (buildmode === 2) {
-			ctx.strokeStyle = this.color;
-			ctx.strokeRect(this.lx + 65, this.ly+70, 65, 65);
-		}
-		
-		//SLOW TOWER
-		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405,265,95,95, this.lx + 65+65,this.ly + 70, 65, 65);
-		if (money >= 150) {
-			ctx.fillStyle = "#00ff00";
-		} else {
-			ctx.fillStyle = "#000000";
-		}
-		ctx.fillText  ("$150", this.lx+75+65, this.ly+150);
-		if (buildmode === 3) {
-			ctx.strokeStyle = this.color;
-			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
+			ctx.fillText  ("Fire Wave", x+75, y+20);
+			ctx.drawImage(ASSET_MANAGER.getAsset("./img/tooltip.png"), 0,0,16,16,x-10,y, 16, 16);
+			
+			var backcolor = "#222222";
+			//Normal tower
+			if (mx >= x-10 && mx <= x + 6 && my >= y && my <= y + 16) {
+				ctx.fillStyle = backcolor;
+				ctx.fillRect(x, y-50, 150, 50);
+				//*************Make images for ability tooltips**************************
+			}
 		}
 		
+		// Tower buttons
+		towerbutton(ctx,"./img/human-towers.png" , 	  this.lx,     this.ly+70, 65,   65,  65,  cost[0], 1);
+		towerbutton(ctx,"./img/human-buildings.png" , this.lx+65,  this.ly+70, 400, 360, 100,  cost[1], 2);
+		towerbutton(ctx,"./img/human-buildings.png" , this.lx+130, this.ly+70, 405, 265, 95,   cost[2], 3);
+				
 		//------------GAME INFO-------------
-       // ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),300,292,this.w,this.h,this.lx + this.scalex * 2 + 8,this.ly + 75,this.scalex,this.scaley);
         ctx.fillStyle = "#000000";
         ctx.font = "22px sans-serif";
 		var text = this.ly + 200;
@@ -235,44 +222,11 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           ctx.fillText  ("GameOver:", this.lx, 1800);
         }
 		
-		// -------SPECIAL ABILITIES---------
-		// FIRE WAVE
-		ctx.drawImage(ASSET_MANAGER.getAsset("./img/firewave.png"), 0,0,64,64, this.lx,this.ly + 300, 65, 65);
-		if (money >= 200) {
-			ctx.fillStyle = "#00ff00";
-		} else {
-			ctx.fillStyle = "#000000";
-		}
-		ctx.fillText  ("$200", this.lx+75, this.ly+350);
-		ctx.fillStyle = "#000000";
-		ctx.fillText  ("Fire Wave", this.lx+75, this.ly+320);
-		
-		// BUILDING HEAL
-		ctx.drawImage(ASSET_MANAGER.getAsset("./img/buildingheal.png"), 0,0,64,64, this.lx,this.ly + 375, 65, 65);
-		if (money >= 200) {
-			ctx.fillStyle = "#00ff00";
-		} else {
-			ctx.fillStyle = "#000000";
-		}
-		ctx.fillText  ("$200", this.lx+75, this.ly+425);
-		ctx.fillStyle = "#000000";
-		ctx.fillText  ("Heal", this.lx+75, this.ly+395);
-
-		
-		// SPAWN MAGE
-		ctx.drawImage(ASSET_MANAGER.getAsset("./img/spawnmage.png"), 0,0,64,64, this.lx,this.ly + 450, 65, 65);
-		if (money >= 300) {
-			ctx.fillStyle = "#00ff00";
-		} else {
-			ctx.fillStyle = "#000000";
-		}
-		ctx.fillText  ("$300", this.lx+75, this.ly+500);
-		ctx.fillStyle = "#000000";
-		ctx.fillText  ("Mage", this.lx+75, this.ly+470);
-
+		//Ability buttons
+		abilitybutton(ctx, "./img/firewave.png", 	 this.lx, this.ly+300, cost[3]);
+		abilitybutton(ctx, "./img/buildingheal.png", this.lx, this.ly+375, cost[4]);
+		//abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, cost[5]);
       }
-
-
 
       /*################ TOWER ###############*/
       function Tower(game, xindex, yindex) {
@@ -292,7 +246,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         // this.animation2 = new Animation(ASSET_MANAGER.getAsset("./img/tower1.png"),
         // 0, 64 * 2, 64, 64, 1, 1, true, false);
       }
-
       Tower.prototype = new Entity();
       Tower.prototype.constructor = Tower;
       Tower.prototype.update = function() {
@@ -319,7 +272,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           this.target = newtarget;
         }
       }
-
       Tower.prototype.draw = function(ctx) {
         ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size,this.size,this.size,this.size,this.xindex * this.size, this.yindex * this.size, this.size, this.size);
         // this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
@@ -355,7 +307,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.target = [];
 
       }
-
       AOETower.prototype = new Entity();
       AOETower.prototype.constructor = AOETower;
       AOETower.prototype.update = function() {
@@ -365,7 +316,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
             }
           }
       }
-
       AOETower.prototype.draw = function(ctx) {
         ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
         //this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
@@ -388,7 +338,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           }
       }
 	  
-	  	  /*############## SLOW TOWER #############*/
+	/*############## SLOW TOWER #############*/
 	  function SlowTower(game, xindex, yindex) {
         this.d = 0;
         this.xindex = xindex;
@@ -403,7 +353,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.targets = [];
 
       }
-
       SlowTower.prototype = new Entity();
       SlowTower.prototype.constructor = AOETower;
       SlowTower.prototype.update = function() {
@@ -422,7 +371,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			}
 		}
       }
-
       SlowTower.prototype.draw = function(ctx) {
         ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405,265,95,95, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
         for (var i = 0; i < enemies.length; i++) {
@@ -436,9 +384,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           }
       }
 
-	  
-	  
-	    
       /*################ GRUNT ################*/
       function Grunt(){
         this.frameWidth = 76;
@@ -461,8 +406,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.ground = 400;
 		this.slowed = false;
       }
-
-
       Grunt.prototype.constructor = Grunt;
       Grunt.prototype.update = function(){
         if (this.x >= 1410){
@@ -478,7 +421,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         }
         this.healthbar.update();
       }
-
       Grunt.prototype.draw = function(ctx){
         if (this.attacking) {
           this.attackAnimation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
@@ -492,7 +434,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           this.healthbar.draw(this.x, this.y, ctx);
         }
       }
-
 
       /*################ TROLL ################*/
       function Troll(){
@@ -516,8 +457,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.ground = 400;
 		this.slowed = false;
       }
-
-
       Troll.prototype.constructor = Troll;
       Troll.prototype.update = function(){
         if (this.x >= 1410){
@@ -533,7 +472,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         }
         this.healthbar.update();
       }
-
       Troll.prototype.draw = function(ctx){
         if (this.attacking) {
           this.attackAnimation.drawFrame(gameboard.game.clockTick, ctx, this.x, this.y);
@@ -547,7 +485,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
           this.healthbar.draw(this.x, this.y, ctx);
         }
       }
-
 
       /*################ OGRE ################*/
       function Ogre(){
@@ -569,7 +506,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         this.ground = 400;
 		this.slowed = false;
       }
-
       Ogre.prototype.constructor = Ogre;
       Ogre.prototype.update = function(){
         if (this.x >= 1410){
@@ -585,7 +521,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         }
         this.healthbar.update();
       }
-
       Ogre.prototype.draw = function(ctx){
 
         if (this.attacking) {
@@ -719,21 +654,8 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
             }
           }
           //Remove enemies that have been killed
-
-          if (wavespawning) {
-
-            var sum = 0;
-            for (var i = 0; i < 3; i++) {
-              sum += wavecount[i];
-            }
-            if (sum == 0) {
-              wavespawning = false;
-            }
-          }
-
           Entity.prototype.update.call(this);
         }
-
         GameBoard.prototype.draw = function (ctx) {
           //Draw background
           background.draw(ctx);
@@ -820,13 +742,13 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		ASSET_MANAGER.queueDownload("./img/firewave.png");
 		ASSET_MANAGER.queueDownload("./img/buildingheal.png");
 		ASSET_MANAGER.queueDownload("./img/spawnmage.png");
+		ASSET_MANAGER.queueDownload("./img/tooltip.png");
 
 
         ASSET_MANAGER.downloadAll(function(){
           console.log("starting up da sheild");
           var canvas = document.getElementById('gameWorld');
           var ctx = canvas.getContext('2d');
-
 
           gameEngine = new GameEngine();
           gameboard = new GameBoard(gameEngine);
