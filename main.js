@@ -169,6 +169,15 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 				}
 			}
           }
+		  
+		  //Spawn Mage button this.lx,this.ly + 450
+		  if(this.cx >= this.lx && this.cx <= this.lx + 65
+			&& this.cy >= this.ly +450 && this.cy <= this.ly+450+65)		 {
+			if (money >= 300) {
+				money -= 300;
+				//SPAWN MAGE
+			}
+          }
         }
       }
       Toolbar.prototype.draw = function(ctx){
@@ -235,10 +244,6 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			ctx.fillStyle = "#000000";
 		}
 		ctx.fillText  ("$200", this.lx+75, this.ly+320);
-		if (buildmode === 3) {
-			ctx.strokeStyle = this.color;
-			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
-		}
 		
 		// BUILDING HEAL
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/buildingheal.png"), 0,0,64,64, this.lx,this.ly + 375, 65, 65);
@@ -248,11 +253,16 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			ctx.fillStyle = "#000000";
 		}
 		ctx.fillText  ("$200", this.lx+75, this.ly+395);
-		if (buildmode === 3) {
-			ctx.strokeStyle = this.color;
-			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
-		}
+
 		
+		// SPAWN MAGE
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/spawnmage.png"), 0,0,64,64, this.lx,this.ly + 450, 65, 65);
+		if (money >= 300) {
+			ctx.fillStyle = "#00ff00";
+		} else {
+			ctx.fillStyle = "#000000";
+		}
+		ctx.fillText  ("$300", this.lx+75, this.ly+470);
 
       }
 
@@ -803,7 +813,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		ASSET_MANAGER.queueDownload("./img/scroll.png");
 		ASSET_MANAGER.queueDownload("./img/firewave.png");
 		ASSET_MANAGER.queueDownload("./img/buildingheal.png");
-
+		ASSET_MANAGER.queueDownload("./img/spawnmage.png");
 
 
         ASSET_MANAGER.downloadAll(function(){
