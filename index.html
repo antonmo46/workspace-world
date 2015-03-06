@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8">
     <title>Game Project Shell</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+
     <script type="text/javascript" src="./gameengine.js"></script>
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./main.js"></script>
@@ -12,23 +15,38 @@
     		canvas.setAttribute('tabindex','0');
     		canvas.focus();
 	}
-        </script>
+    </script>
+    <script>
+		function start() {
+		    alert("hello moscow");
+		}
+	</script>
     <style>
 		* {
 			margin: 0;
 			padding: 0;
 		}
-		h2 {
+		h3 {
+			margin:0;
 			text-align: right;
 			margin-right: 120px;
 		}
-</style>
+	</style>
 </head>
 <body>
     <canvas id="gameWorld" tabindex="1" width="1800" height="745" style="vertical-align: top; display: block; background: lightskyblue"></canvas>
-	<h2> 1 - Build Tower $100</h2>
-	<h2> 2 - Build AOE Tower $250</h2>
-	<h2> 3 - Build Slow Tower $150</h2>
-	<h2> Space to start game</h2>
+	<div class="row">
+  		<div class="col-md-3 col-md-offset-4">
+  			<button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top: 20px" onclick="start()">Start Game</button>
+  		</div>
+  		<div class="col-md-3 col-md-offset-2">
+  			<h3> 1 - Build Tower $100</h3>
+			<h3> 2 - Build AOE Tower $250</h3>
+			<h3> 3 - Build Slow Tower $150</h3>
+			<h3> Space to start game</h3>
+  		</div>
+	</div>
+    
+	
 </body>
 </html>
