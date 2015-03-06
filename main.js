@@ -243,7 +243,9 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		} else {
 			ctx.fillStyle = "#000000";
 		}
-		ctx.fillText  ("$200", this.lx+75, this.ly+320);
+		ctx.fillText  ("$200", this.lx+75, this.ly+350);
+		ctx.fillStyle = "#000000";
+		ctx.fillText  ("Fire Wave", this.lx+75, this.ly+320);
 		
 		// BUILDING HEAL
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/buildingheal.png"), 0,0,64,64, this.lx,this.ly + 375, 65, 65);
@@ -252,7 +254,9 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		} else {
 			ctx.fillStyle = "#000000";
 		}
-		ctx.fillText  ("$200", this.lx+75, this.ly+395);
+		ctx.fillText  ("$200", this.lx+75, this.ly+425);
+		ctx.fillStyle = "#000000";
+		ctx.fillText  ("Heal", this.lx+75, this.ly+395);
 
 		
 		// SPAWN MAGE
@@ -262,7 +266,9 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		} else {
 			ctx.fillStyle = "#000000";
 		}
-		ctx.fillText  ("$300", this.lx+75, this.ly+470);
+		ctx.fillText  ("$300", this.lx+75, this.ly+500);
+		ctx.fillStyle = "#000000";
+		ctx.fillText  ("Mage", this.lx+75, this.ly+470);
 
       }
 
