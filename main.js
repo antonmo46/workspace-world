@@ -174,7 +174,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		  if(this.cx >= this.lx && this.cx <= this.lx + 65
 			&& this.cy >= this.ly +450 && this.cy <= this.ly+450+65)		 {
 			if (money >= 300) {
-				money -= 300;
+				//money -= 300;
 				//SPAWN MAGE
 			}
           }
