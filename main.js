@@ -111,7 +111,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
       this.w = 46;
       this.h = 38;
       this.lx = 1600;
-      this.ly = 10;
+      this.ly = 50;
       this.scalex = this.w * 1;
       this.scaley = this.h * 1;
       this.color = "Chartreuse";
@@ -127,31 +127,54 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         if(this.game.click){
           this.cx = this.game.click.x;
           this.cy = this.game.click.y;
+		  //normal tower button
           if(this.cx >= this.lx && this.cx <= this.lx + 65
 			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65) {
 			if (money >= 100) {
 				buildmode = 1;
 			}
           }
+		  //AOE tower button
 		 if(this.cx >= this.lx +65 && this.cx <= this.lx + 65+65
 			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
 			if (money >= 250) {
 				buildmode = 2;
 			}
           }
+		  //Slow tower button
 		  if(this.cx >= this.lx +65+65 && this.cx <= this.lx + 65+65+65
 			&& this.cy >= this.ly +70 && this.cy <= this.ly+70+65)		 {
 			if (money >= 150) {
 				buildmode = 3;
 			}
           }
+		  //Fire Wave button this.lx, this.ly + 300
+		  if(this.cx >= this.lx && this.cx <= this.lx + 65
+			&& this.cy >= this.ly +300 && this.cy <= this.ly+300+65)		 {
+			if (money >= 200) {
+				money -= 200;
+				for(var i = 0; i < enemies.length; i++) {
+					enemies[i].healthbar.health = enemies[i].healthbar.health/2; 
+				}
+			}
+          }
+		  //Building Heal button this.lx,this.ly + 375, 65, 65
+		  if(this.cx >= this.lx && this.cx <= this.lx + 65
+			&& this.cy >= this.ly +375 && this.cy <= this.ly+375+65)		 {
+			if (money >= 200) {
+				money -= 200;
+				building.healthbar.health += 50;
+				if(building.healthbar.health > 100) {
+					building.healthbar.health = 100;
+				}
+			}
+          }
         }
       }
       Toolbar.prototype.draw = function(ctx){
-        //ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),6,251,  this.w,this.h,this.lx + this.scalex * 0 + 0,this.ly + 75,this.scalex,this.scaley);
-        //ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),251,292,this.w,this.h,this.lx + this.scalex * 1 + 4,this.ly + 75,this.scalex,this.scaley);
-		//ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65 * 1 + 4,this.ly + 75, 65, 65);
+        // -----------TOWER CONTROLS--------------
 		ctx.font = "22px sans-serif";
+		// NORMAL TOWER
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), 65,65,65,65,this.lx,this.ly + 70, 65, 65);
 		if (money >= 100) {
 			ctx.fillStyle = "#00ff00";
@@ -165,6 +188,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			
 		}
 		
+		//AOE TOWER
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400,360,100,100, this.lx + 65,this.ly + 70, 65, 65);
 		if (money >= 250) {
 			ctx.fillStyle = "#00ff00";
@@ -177,6 +201,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			ctx.strokeRect(this.lx + 65, this.ly+70, 65, 65);
 		}
 		
+		//SLOW TOWER
 		ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405,265,95,95, this.lx + 65+65,this.ly + 70, 65, 65);
 		if (money >= 150) {
 			ctx.fillStyle = "#00ff00";
@@ -189,24 +214,45 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
 		}
 		
-		
+		//------------GAME INFO-------------
        // ctx.drawImage(ASSET_MANAGER.getAsset("./img/toolbar.png"),300,292,this.w,this.h,this.lx + this.scalex * 2 + 8,this.ly + 75,this.scalex,this.scaley);
         ctx.fillStyle = "#000000";
         ctx.font = "22px sans-serif";
-		var text = 200;
+		var text = this.ly + 200;
         ctx.fillText  ("Money: " + money, this.lx, text);
         ctx.fillText  ("Score: " + score, this.lx, text + 20);
         ctx.fillText  ("Time: " + parseInt(gameEngine.timer.gameTime,10) + " sec(s)", this.lx, text + 40);
         if(gameEngine.gameover === 1){
           ctx.fillText  ("GameOver:", this.lx, 1800);
         }
-        //if(cx === 0 || !cx){
-        //var cx = this.game.click?this.game.click.x:0
-        //var cy = this.game.click?this.game.click.y:0
-        // }
-        //ctx.fillText  ("Buildmode: " + buildmode, this.lx, text + 60);
-        //ctx.fillText  ("cx: " + this.cx, this.lx, text + 80);
-        //ctx.fillText  ("cy: " + this.cy, this.lx, text + 100);
+		
+		// -------SPECIAL ABILITIES---------
+		// FIRE WAVE
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/firewave.png"), 0,0,64,64, this.lx,this.ly + 300, 65, 65);
+		if (money >= 200) {
+			ctx.fillStyle = "#00ff00";
+		} else {
+			ctx.fillStyle = "#000000";
+		}
+		ctx.fillText  ("$200", this.lx+75, this.ly+320);
+		if (buildmode === 3) {
+			ctx.strokeStyle = this.color;
+			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
+		}
+		
+		// BUILDING HEAL
+		ctx.drawImage(ASSET_MANAGER.getAsset("./img/buildingheal.png"), 0,0,64,64, this.lx,this.ly + 375, 65, 65);
+		if (money >= 200) {
+			ctx.fillStyle = "#00ff00";
+		} else {
+			ctx.fillStyle = "#000000";
+		}
+		ctx.fillText  ("$200", this.lx+75, this.ly+395);
+		if (buildmode === 3) {
+			ctx.strokeStyle = this.color;
+			ctx.strokeRect(this.lx + 65+65, this.ly+70, 65, 65);
+		}
+		
 
       }
 
@@ -755,6 +801,8 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         ASSET_MANAGER.queueDownload("./img/human-towers.png");
         ASSET_MANAGER.queueDownload("./img/terrain2.png");
 		ASSET_MANAGER.queueDownload("./img/scroll.png");
+		ASSET_MANAGER.queueDownload("./img/firewave.png");
+		ASSET_MANAGER.queueDownload("./img/buildingheal.png");
 
 
 
