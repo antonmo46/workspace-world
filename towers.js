@@ -123,7 +123,7 @@ SlowTower.prototype = new Entity();
 SlowTower.prototype.constructor = AOETower;
 SlowTower.prototype.update = function() {
   for (var i = 0; i < this.gameBoard.enemies.length; i++) {
-    if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - enemies[i].comy)) ^ 2)) <= this.range) {
+    if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - this.gameBoard.enemies[i].comy)) ^ 2)) <= this.range) {
       this.targets.push(this.gameBoard.enemies[i]);
     }
   }
