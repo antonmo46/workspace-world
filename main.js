@@ -158,7 +158,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		}
 		
 		// Draws a build button for a tower including tooltip
-		function towerbutton(ctx, image, x, y, framex, framey, size, cost, buildnum, name) {
+		function towerbutton(ctx, image, x, y, framex, framey, size, cost, buildnum, name, tooltip) {
 			ctx.font = "22px sans-serif";
 			ctx.fillStyle = "#000000";
 			ctx.fillText  (name, x, y-10);
@@ -176,38 +176,30 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 			var backcolor = "#222222";
 			//Normal tower
 			if (mx >= x && mx <= x + 16 && my >= y && my <= y + 16) {
-				ctx.fillStyle = backcolor;
-				ctx.fillRect(1585, y-50, 200, 50);
-				//*************Make images for tower tooltips**************************
+				ctx.drawImage(ASSET_MANAGER.getAsset(tooltip), 0,0,250,90,1600,y-100, 200, 80);
 			}
 		}
 
 		// Draws a button for a special ability including tooltip
-		function abilitybutton(ctx, image, x, y, name, cost) {
+		function abilitybutton(ctx, image, x, y, name, cost, tooltip) {
 			ctx.drawImage(ASSET_MANAGER.getAsset(image), 0,0,64,64, x,y, 65, 65);
-			if (money >= cost) {
-				ctx.fillStyle = "#00ff00";
-			} else {
-				ctx.fillStyle = "#000000";
-			}
-			ctx.fillText  ("$"+cost, x+75, y+50);
 			ctx.fillStyle = "#000000";
 			ctx.fillText  (name, x+75, y+20);
-			ctx.drawImage(ASSET_MANAGER.getAsset("./img/tooltip.png"), 0,0,16,16,x-10,y, 16, 16);
-			
-			var backcolor = "#222222";
-			//Normal tower
+			if (money >= cost) {
+				ctx.fillStyle = "#00ff00";
+			}
+			ctx.fillText  ("$"+cost, x+75, y+50);
+			ctx.drawImage(ASSET_MANAGER.getAsset("./img/tooltip.png"), 0,0,16,16,x-10,y, 16, 16);		
+
 			if (mx >= x-10 && mx <= x + 6 && my >= y && my <= y + 16) {
-				ctx.fillStyle = backcolor;
-				ctx.fillRect(x, y-50, 150, 50);
-				//*************Make images for ability tooltips**************************
+				ctx.drawImage(ASSET_MANAGER.getAsset(tooltip), 0,0,250,120,x-10,y-100, 200, 100);
 			}
 		}
 		
 		// Tower buttons
-		towerbutton(ctx,"./img/human-towers.png" , 	  this.lx,     this.ly+70, 65,   65,  65,  cost[0], 1, "REG");
-		towerbutton(ctx,"./img/human-buildings.png" , this.lx+65,  this.ly+70, 400, 360, 100,  cost[1], 2, "AOE");
-		towerbutton(ctx,"./img/human-buildings.png" , this.lx+130, this.ly+70, 405, 265, 95,   cost[2], 3, "SLOW");
+		towerbutton(ctx,"./img/human-towers.png" , 	  this.lx,     this.ly+70, 65,   65,  65,  cost[0], 1, "REG", "./img/tower1_tooltip.png");
+		towerbutton(ctx,"./img/human-buildings.png" , this.lx+65,  this.ly+70, 400, 360, 100,  cost[1], 2, "AOE", "./img/tower2_tooltip.png");
+		towerbutton(ctx,"./img/human-buildings.png" , this.lx+130, this.ly+70, 405, 265, 95,   cost[2], 3, "SLOW", "./img/tower3_tooltip.png");
 				
 		//------------GAME INFO-------------
         ctx.fillStyle = "#000000";
@@ -221,8 +213,8 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
         }
 		
 		//Ability buttons
-		abilitybutton(ctx, "./img/firewave.png", 	 this.lx, this.ly+300, "Fire Wave",  cost[3]);
-		abilitybutton(ctx, "./img/buildingheal.png", this.lx, this.ly+375, "Heal", 		 cost[4]);
+		abilitybutton(ctx, "./img/firewave.png", 	 this.lx, this.ly+300, "Fire Wave",  cost[3], "./img/firewave_tooltip.png");
+		abilitybutton(ctx, "./img/buildingheal.png", this.lx, this.ly+375, "Heal", 		 cost[4], "./img/heal_tooltip.png");
 		//abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, "Mage",       cost[5]);
     }
 
@@ -722,6 +714,11 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		ASSET_MANAGER.queueDownload("./img/buildingheal.png");
 		ASSET_MANAGER.queueDownload("./img/spawnmage.png");
 		ASSET_MANAGER.queueDownload("./img/tooltip.png");
+		ASSET_MANAGER.queueDownload("./img/firewave_tooltip.png");
+		ASSET_MANAGER.queueDownload("./img/heal_tooltip.png");
+		ASSET_MANAGER.queueDownload("./img/tower1_tooltip.png");
+		ASSET_MANAGER.queueDownload("./img/tower2_tooltip.png");
+		ASSET_MANAGER.queueDownload("./img/tower3_tooltip.png");
 
 
         ASSET_MANAGER.downloadAll(function(){
