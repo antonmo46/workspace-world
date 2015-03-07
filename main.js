@@ -56,7 +56,7 @@ Building.prototype.constructor = Building;
 Building.prototype.update = function() {
   if (this.healthbar.health <= 0) {
     this.gameBoard.gameEngine.gameover = 1;
-  } 
+  }
   this.healthbar.update();
 }
 Building.prototype.draw = function(ctx) {
@@ -196,6 +196,30 @@ Toolbar.prototype.draw = function(ctx) {
   //abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, "Mage",       cost[5], "./img/mage_tooltip.png");
 }
 
+ /*############## Health Bar #############*/
+function Healthbar(width, height, offset, hitpoints) {
+  this.width = width;
+  this.height = height;
+  this.offset = offset;
+  this.health = hitpoints;
+  this.maxhealth = hitpoints;
+  this.color = "#33CC33";
+}
+Healthbar.prototype.constructor = Healthbar;
+Healthbar.prototype.update = function() {
+  if (this.health > .5 * this.maxhealth) {
+    this.color = "#33CC33";
+  } else if (this.health > .2 * this.maxhealth && this.health < .5 * this.maxhealth) {
+    this.color = "#FFD700";
+  } else if (this.health < .2 * this.maxhealth) {
+    this.color = "#CC0000";
+  }
+}
+Healthbar.prototype.draw = function(pos1, pos2, ctx) {
+  ctx.fillStyle = this.color;
+  ctx.fillRect(pos1 + this.offset, pos2, (this.health / 100) * this.width, this.height);
+}
+
 /*############## Board #############*/
 function GameBoard(game) {
   //uu
@@ -299,77 +323,92 @@ GameBoard.prototype.update = function() {
 
 }
 GameBoard.prototype.draw = function(ctx) {
-    this.background.draw(ctx);
-    this.toolbar.draw(ctx);
-    this.building.draw(ctx);
+  this.background.draw(ctx);
+  this.toolbar.draw(ctx);
+  this.building.draw(ctx);
 
-    for (var i = 0; i < this.towers.length; i++) {
-      this.towers[i].draw(ctx);
-    }
-    //Draw enemies
-    for (var i = 0; i < this.enemies.length; i++) {
-      this.enemies[i].draw(ctx);
-    }
-    //Draw tower shadow
-    if (this.gameEngine.mouse) {
-      var mx = Math.floor(this.gameEngine.mouse.x / 65);
-      var my = Math.floor(this.gameEngine.mouse.y / 65);
-      ctx.save();
-      ctx.globalAlpha = 0.5;
-      // check if moved within a grid
-      if (mx < this.gridwidth && my < this.gridheight) {
-        if (this.matrixmap[mx][my] == 0) {
-          if (this.buildmode == 1) {
-            ctx.beginPath();
-            ctx.fillStyle = "gray";
-            ctx.arc(mx * this.size + 32, my * this.size + 32, 150, 0, Math.PI * 2, false);
-            ctx.fill();
-            ctx.closePath();
-            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size, this.size, this.size, this.size, mx * this.size, my * this.size, this.size, this.size);
-          } else if (this.buildmode == 2) {
-            ctx.beginPath();
-            ctx.fillStyle = "gray";
-            ctx.arc(mx * this.size + 32, my * this.size + 32, 150, 0, Math.PI * 2, false);
-            ctx.fill();
-            ctx.closePath();
-            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400, 360, 100, 100, mx * this.size, my * this.size, this.size, this.size);
-          } else if (this.buildmode == 3) {
-            ctx.beginPath();
-            ctx.fillStyle = "gray";
-            ctx.arc(mx * this.size + 32, my * this.size + 32, 150, 0, Math.PI * 2, false);
-            ctx.fill();
-            ctx.closePath();
-            ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405, 265, 95, 95, mx * this.size, my * this.size, this.size, this.size);
-          }
+  for (var i = 0; i < this.towers.length; i++) {
+    this.towers[i].draw(ctx);
+  }
+  //Draw enemies
+  for (var i = 0; i < this.enemies.length; i++) {
+    this.enemies[i].draw(ctx);
+  }
+  //Draw tower shadow
+  if (this.gameEngine.mouse) {
+    var mx = Math.floor(this.gameEngine.mouse.x / 65);
+    var my = Math.floor(this.gameEngine.mouse.y / 65);
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    // check if moved within a grid
+    if (mx < this.gridwidth && my < this.gridheight) {
+      if (this.matrixmap[mx][my] == 0) {
+        if (this.buildmode == 1) {
+          ctx.beginPath();
+          ctx.fillStyle = "gray";
+          ctx.arc(mx * this.size + 32, my * this.size + 32, 150, 0, Math.PI * 2, false);
+          ctx.fill();
+          ctx.closePath();
+          ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size, this.size, this.size, this.size, mx * this.size, my * this.size, this.size, this.size);
+        } else if (this.buildmode == 2) {
+          ctx.beginPath();
+          ctx.fillStyle = "gray";
+          ctx.arc(mx * this.size + 32, my * this.size + 32, 150, 0, Math.PI * 2, false);
+          ctx.fill();
+          ctx.closePath();
+          ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400, 360, 100, 100, mx * this.size, my * this.size, this.size, this.size);
+        } else if (this.buildmode == 3) {
+          ctx.beginPath();
+          ctx.fillStyle = "gray";
+          ctx.arc(mx * this.size + 32, my * this.size + 32, 150, 0, Math.PI * 2, false);
+          ctx.fill();
+          ctx.closePath();
+          ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 405, 265, 95, 95, mx * this.size, my * this.size, this.size, this.size);
         }
       }
-      ctx.restore();
     }
-    Entity.prototype.draw.call(this);
+    ctx.restore();
   }
-  /*############## Health Bar #############*/
-function Healthbar(width, height, offset, hitpoints) {
-  this.width = width;
-  this.height = height;
-  this.offset = offset;
-  this.health = hitpoints;
-  this.maxhealth = hitpoints;
-  this.color = "#33CC33";
+  Entity.prototype.draw.call(this);
 }
-Healthbar.prototype.constructor = Healthbar;
-Healthbar.prototype.update = function() {
-  if (this.health > .5 * this.maxhealth) {
-    this.color = "#33CC33";
-  } else if (this.health > .2 * this.maxhealth && this.health < .5 * this.maxhealth) {
-    this.color = "#FFD700";
-  } else if (this.health < .2 * this.maxhealth) {
-    this.color = "#CC0000";
+GameBoard.prototype.spawnWaves = function() {
+    var that = this;
+    var timerX = 0;
+    var period = 0;
+    var amount_in_wave = 3;
+
+    setInterval(function() {
+      if (timerX < amount_in_wave && period == 0) {
+        that.enemies.push(new Troll(that));
+        timerX++;
+      } else if (timerX < amount_in_wave && period == 1) {
+        that.enemies.push(new Grunt(that));
+        timerX++;
+      } else if (timerX < amount_in_wave && period == 2) {
+        that.enemies.push(new Ogre(that));
+        timerX++;
+      }
+      if (timerX == amount_in_wave) {
+        timerX = 500000;
+        setTimeout(function() {
+
+          timerX = 0;
+          if (period == 3) {
+            setTimeout(function() {
+              period = 0;
+              amount_in_wave = amount_in_wave + 3;
+            }, 10000);
+          }
+        }, 3000);
+        period++;
+      }
+
+      //console.log("timer is " + timer);
+      //console.log("amount in wave " + amount_in_wave);
+      //console.log("period " + amount_in_wave);
+    }, 1000);
   }
-}
-Healthbar.prototype.draw = function(pos1, pos2, ctx) {
-  ctx.fillStyle = this.color;
-  ctx.fillRect(pos1 + this.offset, pos2, (this.health / 100) * this.width, this.height);
-}
+ 
 
 /*################ ASSET_MANAGER ################*/
 var ASSET_MANAGER = new AssetManager();
@@ -403,8 +442,10 @@ function start() {
 
   var gameEngine = new GameEngine();
   var gameboard = new GameBoard(gameEngine);
-  
+
   gameEngine.addEntity(gameboard);
-  gameEngine.init(ctx,gameboard);
+  gameEngine.init(ctx, gameboard);
   gameEngine.start();
+  gameboard.spawnWaves();
+  
 }
