@@ -206,7 +206,7 @@ function GameBoard(game) {
   this.toolbar = new Toolbar(this);
 
   this.buildmode = 0;
-  this.money = 300;
+  this.money = 340;
   this.score = 0;
   this.cost = [100, 250, 150, 200, 200, 300];
   this.enemies = [];
@@ -257,7 +257,7 @@ GameBoard.prototype.update = function() {
       }
       if (this.money >= this.cost[1]) {
         if (this.buildmode == 2) {
-          this.this.matrixmap[cx][cy] = 2;
+          this.matrixmap[cx][cy] = 2;
           this.towers.push(new AOETower(this, cx, cy));
           this.money -= this.cost[1];
           this.score += 15;
