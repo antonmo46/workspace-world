@@ -38,10 +38,12 @@ function GameEngine() {
   this.surfaceHeight = null;
   this.direction = 0;
   this.gameover = 0;
+  this.gameBoard = null;
 }
 
-GameEngine.prototype.init = function(ctx) {
+GameEngine.prototype.init = function(ctx, board) {
   this.ctx = ctx;
+  this.gameBoard = board;
   this.surfaceWidth = this.ctx.canvas.width;
   this.surfaceHeight = this.ctx.canvas.height;
   this.startInput();
@@ -67,26 +69,23 @@ GameEngine.prototype.startInput = function() {
   var period = 0;
   var amount_in_wave = 3;
 
+  
   var that = this;
-
   this.ctx.canvas.addEventListener("keydown", function(e) {
+    
     if (String.fromCharCode(e.which) === ' ') {
-
-
-      var that = this;
-
       setInterval(function() {
         if (timerX < amount_in_wave && period == 0) {
-          var troll = new Troll();
-          enemies.push(troll);
+          var troll = new Troll(that.gameBoard);
+          that.gameBoard.enemies.push(troll);
           timerX++;
         } else if (timerX < amount_in_wave && period == 1) {
-          var grunt = new Grunt();
-          enemies.push(grunt);
+          var grunt = new Grunt(that.gameBoard);
+          that.gameBoard.enemies.push(grunt);
           timerX++;
         } else if (timerX < amount_in_wave && period == 2) {
-          var ogre = new Ogre();
-          enemies.push(ogre);
+          var ogre = new Ogre(that.gameBoard);
+          that.gameBoard.enemies.push(ogre);
           timerX++;
         }
         if (timerX == amount_in_wave) {
@@ -114,25 +113,25 @@ GameEngine.prototype.startInput = function() {
       // var ogre = new Ogre();
       // enemies.push(ogre);
       // console.log(enemies);
-    } else if (String.fromCharCode(e.which) === 'g') {
-      var grunt = new Grunt();
-      enemies.push(grunt);
+    } else if (String.fromCharCode(e.which) === 'G') {
+      var grunt = new Grunt(that.gameBoard);
+      that.gameBoard.enemies.push(grunt);
       //2console.log(enemies);
-    } else if (String.fromCharCode(e.which) === 't') {
-      var troll = new Troll();
-      enemies.push(troll);
+    } else if (String.fromCharCode(e.which) === 'T') {
+      var troll = new Troll(that.gameBoard);
+      that.gameBoard.enemies.push(troll);
       console.log(enemies);
     } else if (String.fromCharCode(e.which) === '1') {
       if (money >= 100) {
-        buildmode = 1;
+        that.gameBoard.buildmode = 1;
       }
     } else if (String.fromCharCode(e.which) === '2') {
       if (money >= 250) {
-        buildmode = 2;
+        that.gameBoard.buildmode = 2;
       }
     } else if (String.fromCharCode(e.which) === '3') {
       if (money >= 150) {
-        buildmode = 3;
+        that.gameBoard.buildmode = 3;
       }
     } else if (e.which === 27) {
       that.gameover = that.gameover === 1 ? 0 : 1;
