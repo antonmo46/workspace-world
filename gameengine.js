@@ -1,7 +1,4 @@
 // This game shell was happily copied from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
-var timer = 0;
-var period = 0;
-var amount_in_wave = 3;
 window.requestAnimFrame = (function () {
   return window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
@@ -66,6 +63,10 @@ GameEngine.prototype.start = function () {
 
 GameEngine.prototype.startInput = function () {
   console.log('Starting input');
+  var timerX = 0;
+  var period = 0;
+  var amount_in_wave = 3;
+
   var that = this;
 
   this.ctx.canvas.addEventListener("keydown", function (e) {
@@ -75,26 +76,26 @@ GameEngine.prototype.startInput = function () {
       var that = this;
 
       setInterval(function() {
-        if(timer < amount_in_wave && period == 0) {
+        if(timerX < amount_in_wave && period == 0) {
           var troll = new Troll();
           enemies.push(troll);
-          timer++;
+          timerX++;
         }
-        else if(timer < amount_in_wave && period == 1) {
+        else if(timerX < amount_in_wave && period == 1) {
           var grunt = new Grunt();
           enemies.push(grunt);
-          timer++;
+          timerX++;
         }
-        else if(timer < amount_in_wave && period == 2){
+        else if(timerX < amount_in_wave && period == 2){
           var ogre = new Ogre();
           enemies.push(ogre);
-          timer++;
+          timerX++;
         }
-        if(timer == amount_in_wave)  {
-          timer = 500000;
+        if(timerX == amount_in_wave)  {
+          timerX = 500000;
           setTimeout(function () {
 
-            timer = 0;
+            timerX = 0;
             if(period == 3) {
               setTimeout(function () {
                 period = 0;
