@@ -215,7 +215,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		//Ability buttons
 		abilitybutton(ctx, "./img/firewave.png", 	 this.lx, this.ly+300, "Fire Wave",  cost[3], "./img/firewave_tooltip.png");
 		abilitybutton(ctx, "./img/buildingheal.png", this.lx, this.ly+375, "Heal", 		 cost[4], "./img/heal_tooltip.png");
-		abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, "Mage",       cost[5], "./img/mage_tooltip.png");
+		//abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, "Mage",       cost[5], "./img/mage_tooltip.png");
     }
 
       /*################ TOWER ###############*/
