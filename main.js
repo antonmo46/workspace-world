@@ -196,7 +196,7 @@ Toolbar.prototype.draw = function(ctx) {
   //abilitybutton(ctx, "./img/spawnmage.png",    this.lx, this.ly+450, "Mage",       cost[5], "./img/mage_tooltip.png");
 }
 
- /*############## Health Bar #############*/
+/*############## Health Bar #############*/
 function Healthbar(width, height, offset, hitpoints) {
   this.width = width;
   this.height = height;
@@ -372,43 +372,41 @@ GameBoard.prototype.draw = function(ctx) {
   Entity.prototype.draw.call(this);
 }
 GameBoard.prototype.spawnWaves = function() {
-    var that = this;
-    var timerX = 0;
-    var period = 0;
-    var amount_in_wave = 3;
+  var wave = 1;
+  var timerX = 0;
+  var period = 0;
+  var amount_in_wave = 3;
 
-    setInterval(function() {
-      if (timerX < amount_in_wave && period == 0) {
-        that.enemies.push(new Troll(that));
-        timerX++;
-      } else if (timerX < amount_in_wave && period == 1) {
-        that.enemies.push(new Grunt(that));
-        timerX++;
-      } else if (timerX < amount_in_wave && period == 2) {
-        that.enemies.push(new Ogre(that));
-        timerX++;
-      }
-      if (timerX == amount_in_wave) {
-        timerX = 500000;
-        setTimeout(function() {
+  var that = this;
 
-          timerX = 0;
-          if (period == 3) {
-            setTimeout(function() {
-              period = 0;
-              amount_in_wave = amount_in_wave + 3;
-            }, 10000);
-          }
-        }, 3000);
-        period++;
-      }
+  setInterval(function() {
+    if (timerX < amount_in_wave && period == 0) {
+      that.enemies.push(new Troll(that));
+    } else if (timerX < amount_in_wave && period == 1) {
+      that.enemies.push(new Grunt(that));
+    } else if (timerX < amount_in_wave && period == 2) {
+      that.enemies.push(new Ogre(that));
+    }
+    timerX++;
+    if (timerX == amount_in_wave) {
+      setTimeout(function() {
+        timerX = 0;
+        if (period == 3) {
+          setTimeout(function() {
+            period = 0;
+            amount_in_wave = amount_in_wave + 3;
+          }, 10000);
+        }
+      }, 3000);
+      period++;
+    }
 
-      //console.log("timer is " + timer);
-      //console.log("amount in wave " + amount_in_wave);
-      //console.log("period " + amount_in_wave);
-    }, 1000);
-  }
- 
+    //console.log("timer is " + timer);
+    //console.log("amount in wave " + amount_in_wave);
+    //console.log("period " + amount_in_wave);
+  }, 1000);
+}
+
 
 /*################ ASSET_MANAGER ################*/
 var ASSET_MANAGER = new AssetManager();
@@ -447,5 +445,5 @@ function start() {
   gameEngine.init(ctx, gameboard);
   gameEngine.start();
   gameboard.spawnWaves();
-  
+
 }
