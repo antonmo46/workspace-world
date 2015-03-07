@@ -158,13 +158,13 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		}
 		
 		// Draws a build button for a tower including tooltip
-		function towerbutton(ctx, image, x, y, framex, framey, size, cost, buildnum) {
+		function towerbutton(ctx, image, x, y, framex, framey, size, cost, buildnum, name) {
 			ctx.font = "22px sans-serif";
+			ctx.fillStyle = "#000000";
+			ctx.fillText  (name, x, y-10);
 			ctx.drawImage(ASSET_MANAGER.getAsset(image), framex,framey,size,size,x,y, 65, 65);
 			if (money >= cost) {
 				ctx.fillStyle = "#00ff00";
-			} else {
-				ctx.fillStyle = "#000000";
 			}
 			ctx.fillText  ("$"+cost, x+10, y+80);
 			if (buildmode === buildnum) {
@@ -205,9 +205,9 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy){
 		}
 		
 		// Tower buttons
-		towerbutton(ctx,"./img/human-towers.png" , 	  this.lx,     this.ly+70, 65,   65,  65,  cost[0], 1);
-		towerbutton(ctx,"./img/human-buildings.png" , this.lx+65,  this.ly+70, 400, 360, 100,  cost[1], 2);
-		towerbutton(ctx,"./img/human-buildings.png" , this.lx+130, this.ly+70, 405, 265, 95,   cost[2], 3);
+		towerbutton(ctx,"./img/human-towers.png" , 	  this.lx,     this.ly+70, 65,   65,  65,  cost[0], 1, "REG");
+		towerbutton(ctx,"./img/human-buildings.png" , this.lx+65,  this.ly+70, 400, 360, 100,  cost[1], 2, "AOE");
+		towerbutton(ctx,"./img/human-buildings.png" , this.lx+130, this.ly+70, 405, 265, 95,   cost[2], 3, "SLOW");
 				
 		//------------GAME INFO-------------
         ctx.fillStyle = "#000000";
