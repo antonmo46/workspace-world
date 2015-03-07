@@ -48,7 +48,7 @@ GameEngine.prototype.init = function(ctx, board) {
   this.surfaceHeight = this.ctx.canvas.height;
   this.startInput();
   this.timer = new Timer();
-  console.log('game initialized');
+  //console.log('game initialized');
 }
 
 GameEngine.prototype.start = function() {
@@ -65,80 +65,36 @@ GameEngine.prototype.start = function() {
 
 GameEngine.prototype.startInput = function() {
   console.log('Starting input');
-  var timerX = 0;
-  var period = 0;
-  var amount_in_wave = 3;
 
-  
   var that = this;
   this.ctx.canvas.addEventListener("keydown", function(e) {
     
-    if (String.fromCharCode(e.which) === ' ') {
-      setInterval(function() {
-        if (timerX < amount_in_wave && period == 0) {
-          var troll = new Troll(that.gameBoard);
-          that.gameBoard.enemies.push(troll);
-          timerX++;
-        } else if (timerX < amount_in_wave && period == 1) {
-          var grunt = new Grunt(that.gameBoard);
-          that.gameBoard.enemies.push(grunt);
-          timerX++;
-        } else if (timerX < amount_in_wave && period == 2) {
-          var ogre = new Ogre(that.gameBoard);
-          that.gameBoard.enemies.push(ogre);
-          timerX++;
-        }
-        if (timerX == amount_in_wave) {
-          timerX = 500000;
-          setTimeout(function() {
-
-            timerX = 0;
-            if (period == 3) {
-              setTimeout(function() {
-                period = 0;
-                amount_in_wave = amount_in_wave + 3;
-              }, 10000);
-            }
-          }, 3000);
-          period++;
-        }
-
-        //console.log("timer is " + timer);
-        //console.log("amount in wave " + amount_in_wave);
-        //console.log("period " + amount_in_wave);
-      }, 1000);
-
-
-      //that.space = true;
-      // var ogre = new Ogre();
-      // enemies.push(ogre);
-      // console.log(enemies);
-    } else if (String.fromCharCode(e.which) === 'G') {
+    if (String.fromCharCode(e.which) === 'G') {
       var grunt = new Grunt(that.gameBoard);
       that.gameBoard.enemies.push(grunt);
       //2console.log(enemies);
     } else if (String.fromCharCode(e.which) === 'T') {
       var troll = new Troll(that.gameBoard);
       that.gameBoard.enemies.push(troll);
-      console.log(enemies);
+      //console.log(enemies);
     } else if (String.fromCharCode(e.which) === '1') {
-      if (money >= 100) {
+      if (that.gameBoard.money >= 100) {
         that.gameBoard.buildmode = 1;
       }
     } else if (String.fromCharCode(e.which) === '2') {
-      if (money >= 250) {
+      if (that.gameBoard.money >= 250) {
         that.gameBoard.buildmode = 2;
       }
     } else if (String.fromCharCode(e.which) === '3') {
-      if (money >= 150) {
+      if (that.gameBoard.money >= 150) {
         that.gameBoard.buildmode = 3;
       }
     } else if (e.which === 27) {
       that.gameover = that.gameover === 1 ? 0 : 1;
-      console.log('gameover=' + that.gameover);
+      //console.log('gameover=' + that.gameover);
     }
     //console.log(String.fromCharCode(e.which));
-    console.log(e.which);
+    //console.log(e.which);
     e.preventDefault();
   }, false);
 
@@ -164,11 +120,11 @@ GameEngine.prototype.startInput = function() {
   }, false);
 
 
-  console.log('Input started');
+  //console.log('Input started');
 }
 
 GameEngine.prototype.addEntity = function(entity) {
-  console.log('added entity');
+  //console.log('added entity');
   this.entities.push(entity);
 }
 

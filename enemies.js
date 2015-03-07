@@ -9,7 +9,7 @@ function Grunt(gameboard) {
   this.y = 300;
   this.comx = this.x + 35;
   this.comy = this.y + 28.5;
-  this.healthbar = new Healthbar(100, 3, 20, 20);
+  this.healthbar = new Healthbar(gameboard,40, 3, 20, 20);
   this.animation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), this.direction, 0,
     this.frameWidth, this.frameHeight, 0.1, 5, true, true);
   this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/grunt.png"), this.direction, 272,
@@ -61,7 +61,7 @@ function Troll(gameboard) {
   this.y = 300;
   this.comx = this.x + 31.2;
   this.comy = this.y + 27;
-  this.healthbar = new Healthbar(50, 3, 20, 30);
+  this.healthbar = new Healthbar(gameboard, 40, 3, 20, 30);
   this.animation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), this.direction, 0,
     this.frameWidth, this.frameHeight, 0.1, 5, true, true);
   this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/troll.png"), this.direction, 337,
@@ -113,7 +113,7 @@ function Ogre(gameboard) {
   this.y = 300;
   this.comx = this.x + 36;
   this.comy = this.y + 36;
-  this.healthbar = new Healthbar(150, 3, 20, 60);
+  this.healthbar = new Healthbar(gameboard,50, 3, 20, 60);
   this.animation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 0, this.frameWidth, this.frameWidth, 0.10, 5, true, true);
   this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
   this.dieAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), (73 * 9), 0, this.frameWidth, this.frameWidth, 1, 5, true, true);

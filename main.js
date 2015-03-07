@@ -50,7 +50,7 @@ function Building(board) {
   this.xpos = 1455;
   this.ypos = 280;
   this.width = 125
-  this.healthbar = new Healthbar(95, 4, 10, 100);
+  this.healthbar = new Healthbar(board, 95, 4, 10, 100);
 }
 Building.prototype.constructor = Building;
 Building.prototype.update = function() {
@@ -90,7 +90,6 @@ function Toolbar(board) {
 Toolbar.prototype.constructor = Toolbar;
 Toolbar.prototype.update = function() {
   if (this.gameBoard.gameEngine.click) {
-    console.log("click222!");
     this.cx = this.gameBoard.gameEngine.click.x;
     this.cy = this.gameBoard.gameEngine.click.y;
     //normal tower button
@@ -197,12 +196,13 @@ Toolbar.prototype.draw = function(ctx) {
 }
 
 /*############## Health Bar #############*/
-function Healthbar(width, height, offset, hitpoints) {
+function Healthbar(board, width, height, offset, hitpoints) {
+  this.gameBoard = board;
   this.width = width;
   this.height = height;
   this.offset = offset;
-  this.health = hitpoints;
-  this.maxhealth = hitpoints;
+  this.health = hitpoints * board.unitsCoeff;
+  this.maxhealth = this.health;
   this.color = "#33CC33";
 }
 Healthbar.prototype.constructor = Healthbar;
@@ -216,13 +216,17 @@ Healthbar.prototype.update = function() {
   }
 }
 Healthbar.prototype.draw = function(pos1, pos2, ctx) {
+  var fixed =  this.health / this.maxhealth;
   ctx.fillStyle = this.color;
-  ctx.fillRect(pos1 + this.offset, pos2, (this.health / 100) * this.width, this.height);
+  ctx.fillRect(pos1 + this.offset, pos2, fixed * this.width, this.height);
 }
 
 /*############## Board #############*/
 function GameBoard(game) {
-  //uu
+  // increase as game level
+  this.unitsCoeff = 1;
+
+
   this.gameEngine = game;
 
   this.background = new Background(this);
@@ -276,7 +280,6 @@ GameBoard.prototype.update = function() {
           this.money -= this.cost[0];
           this.score += 15;
           this.buildmode = 0;
-          console.log(this.towers);
         }
       }
       if (this.money >= this.cost[1]) {
@@ -286,7 +289,6 @@ GameBoard.prototype.update = function() {
           this.money -= this.cost[1];
           this.score += 15;
           this.buildmode = 0;
-          console.log(this.towers);
         }
       }
       if (this.money >= this.cost[2]) {
@@ -296,7 +298,6 @@ GameBoard.prototype.update = function() {
           this.money -= this.cost[2];
           this.score += 15;
           this.buildmode = 0;
-          console.log(this.towers);
         }
       }
     }
@@ -372,39 +373,50 @@ GameBoard.prototype.draw = function(ctx) {
   Entity.prototype.draw.call(this);
 }
 GameBoard.prototype.spawnWaves = function() {
-  var wave = 1;
-  var timerX = 0;
-  var period = 0;
-  var amount_in_wave = 3;
+  this.monsters = 0;
+  this.wave_size = 3;
+  this.lock = 0;
+  this.wave_num = 0;
+  this.wave_last_updated = 0;
 
   var that = this;
 
-  setInterval(function() {
-    if (timerX < amount_in_wave && period == 0) {
-      that.enemies.push(new Troll(that));
-    } else if (timerX < amount_in_wave && period == 1) {
-      that.enemies.push(new Grunt(that));
-    } else if (timerX < amount_in_wave && period == 2) {
-      that.enemies.push(new Ogre(that));
-    }
-    timerX++;
-    if (timerX == amount_in_wave) {
-      setTimeout(function() {
-        timerX = 0;
-        if (period == 3) {
-          setTimeout(function() {
-            period = 0;
-            amount_in_wave = amount_in_wave + 3;
-          }, 10000);
+  (function loop() {
+    var rand = Math.round(Math.random() * 1000);
+    setTimeout(function() {
+      if (that.lock === 0) {
+        that.monsters++;
+        if (Math.floor((Math.random() * 3)) === 0){
+          that.enemies.push(new Grunt(that));
+        }else if (Math.floor((Math.random() * 3)) === 1){
+          that.enemies.push(new Troll(that));
+        }else if (Math.floor((Math.random() * 3)) === 2){
+          that.enemies.push(new Ogre(that));
         }
-      }, 3000);
-      period++;
-    }
-
-    //console.log("timer is " + timer);
-    //console.log("amount in wave " + amount_in_wave);
-    //console.log("period " + amount_in_wave);
-  }, 1000);
+      }
+      if (that.monsters === that.wave_size) {
+        that.lock = 1;
+        //that2 = this;
+        setTimeout(function() {
+          that.lock = 0;
+        }, 5000);
+        that.monsters = 0;
+        that.wave_size = that.wave_size + 3;
+        that.wave_num++;
+        
+      }
+      console.log("count " + that.wave_num);
+      if(that.wave_num % 4 ===0 && Math.floor(that.wave_num / 4) !== that.wave_last_updated){
+        that.wave_last_updated = Math.floor(that.wave_num / 4);
+        console.log("last " + that.wave_last_updated);
+        that.unitsCoeff = that.unitsCoeff * 2;
+        console.log("coeff " + that.unitsCoeff);
+      }
+      if (that.gameEngine.gameover === 0) {
+        loop();
+      }
+    }, rand);
+  }());
 }
 
 
@@ -434,7 +446,6 @@ ASSET_MANAGER.queueDownload("./img/tower3_tooltip.png");
 ASSET_MANAGER.downloadAll(function() {});
 
 function start() {
-  console.log("starting up da sheild");
   var canvas = document.getElementById('gameWorld');
   var ctx = canvas.getContext('2d');
 
