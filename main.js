@@ -56,6 +56,7 @@ Building.prototype.constructor = Building;
 Building.prototype.update = function() {
   if (this.healthbar.health <= 0) {
     this.gameBoard.gameEngine.gameover = 1;
+	alert("Score: "+this.gameBoard.score);
 	restart();
   }
   this.healthbar.update();
