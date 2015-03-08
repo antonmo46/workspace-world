@@ -452,13 +452,18 @@ ASSET_MANAGER.downloadAll(function() {
   gameEngine.addEntity(gameboard);
   gameEngine.init(ctx, gameboard);
   gameEngine.start();
+  var audio = new Audio('sound/Game of Thrones.mp3');
+  audio.loop = true;
+  audio.play();
 });
 
 function start() {
+  document.getElementById("start").style.display = "none";
   gameboard.spawnWaves();
 }
 
 function restart() {
+  document.getElementById("start").style.display = "block";
   var canvas = document.getElementById('gameWorld');
   var ctx = canvas.getContext('2d');
 

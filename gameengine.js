@@ -52,9 +52,6 @@ GameEngine.prototype.init = function(ctx, board) {
 }
 
 GameEngine.prototype.start = function() {
-  var audio = new Audio('sound/Game of Thrones.mp3');
-  audio.loop = true;
-  audio.play();
   console.log("starting game");
   var that = this;
   (function gameLoop() {
