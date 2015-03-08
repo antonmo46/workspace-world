@@ -42,7 +42,7 @@ Animation.prototype.isDone = function() {
 }
 
 /*########### GLOBAL DATA STRUCTURES ##################*/
-
+var gameboard;
 
 /*################ BUILDINGS ################*/
 function Building(board) {
@@ -56,6 +56,7 @@ Building.prototype.constructor = Building;
 Building.prototype.update = function() {
   if (this.healthbar.health <= 0) {
     this.gameBoard.gameEngine.gameover = 1;
+	restart();
   }
   this.healthbar.update();
 }
@@ -169,8 +170,6 @@ Toolbar.prototype.abilitybutton = function(ctx, image, x, y, name, cost, tooltip
     ctx.drawImage(ASSET_MANAGER.getAsset(tooltip), 0, 0, 250, 120, x - 10, y - 100, 200, 100);
   }
 }
-
-
 Toolbar.prototype.draw = function(ctx) {
   if (this.gameBoard.gameEngine.mouse) {
     this.mx = this.gameBoard.gameEngine.mouse.x;
@@ -443,18 +442,30 @@ ASSET_MANAGER.queueDownload("./img/tower2_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower3_tooltip.png");
 
 
-ASSET_MANAGER.downloadAll(function() {});
-
-function start() {
+ASSET_MANAGER.downloadAll(function() {
   var canvas = document.getElementById('gameWorld');
   var ctx = canvas.getContext('2d');
 
   var gameEngine = new GameEngine();
-  var gameboard = new GameBoard(gameEngine);
+  gameboard = new GameBoard(gameEngine);
 
   gameEngine.addEntity(gameboard);
   gameEngine.init(ctx, gameboard);
   gameEngine.start();
-  gameboard.spawnWaves();
+});
 
+function start() {
+  gameboard.spawnWaves();
+}
+
+function restart() {
+  var canvas = document.getElementById('gameWorld');
+  var ctx = canvas.getContext('2d');
+
+  var gameEngine = new GameEngine();
+  gameboard = new GameBoard(gameEngine);
+
+  gameEngine.addEntity(gameboard);
+  gameEngine.init(ctx, gameboard);
+  gameEngine.start();
 }
