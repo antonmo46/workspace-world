@@ -236,7 +236,7 @@ function GameBoard(game) {
   this.buildmode = 0;
   this.money = 340;
   this.score = 0;
-  this.cost = [100, 250, 150, 200, 200, 300];
+  this.cost = [100, 250, 150, 1000, 600, 300];
   this.enemies = [];
   this.towers = [];
 
