@@ -120,7 +120,7 @@ Toolbar.prototype.update = function() {
         }
       }
     }
-    //Building Heal button 
+    //Building Heal button
     if (this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly + 375 && this.cy <= this.ly + 375 + 65) {
       if (this.gameBoard.money >= this.gameBoard.cost[4]) {
         this.gameBoard.money -= this.gameBoard.cost[4];
@@ -402,13 +402,13 @@ GameBoard.prototype.spawnWaves = function() {
         that.monsters = 0;
         that.wave_size = that.wave_size + 3;
         that.wave_num++;
-        
+
       }
       console.log("count " + that.wave_num);
       if(that.wave_num % 4 ===0 && Math.floor(that.wave_num / 4) !== that.wave_last_updated){
         that.wave_last_updated = Math.floor(that.wave_num / 4);
         console.log("last " + that.wave_last_updated);
-        that.unitsCoeff = that.unitsCoeff * 2;
+        that.unitsCoeff = that.unitsCoeff * 1.7;
         console.log("coeff " + that.unitsCoeff);
       }
       if (that.gameEngine.gameover === 0) {
