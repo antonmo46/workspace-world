@@ -26,6 +26,7 @@ Grunt.prototype.constructor = Grunt;
 Grunt.prototype.update = function() {
   if (this.x >= 1410) {
     this.attacking = true;
+	this.speed = 0;
   } else {
     if (this.slowed) {
       this.x += this.speed / 2;
@@ -78,6 +79,7 @@ Troll.prototype.constructor = Troll;
 Troll.prototype.update = function() {
   if (this.x >= 1410) {
     this.attacking = true;
+	this.speed = 0;
   } else {
     if (this.slowed) {
       this.x += this.speed / 2;
@@ -129,6 +131,7 @@ Ogre.prototype.constructor = Ogre;
 Ogre.prototype.update = function() {
   if (this.x >= 1410) {
     this.attacking = true;
+	this.speed = 0;
   } else {
     if (this.slowed) {
       this.x += this.speed / 2;

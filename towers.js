@@ -8,25 +8,20 @@ function Tower(gameboard, xindex, yindex) {
   this.x = xindex * this.size + this.size / 2;
   this.y = yindex * this.size + this.size / 2;
   this.range = 15;
-  this.attack = .1;
+  this.attack = 4;
   this.target = 0;
+  this.projectile = 0;
+  this.timer = 0;
+  this.cooldown = 30;
 }
 Tower.prototype = new Entity();
 Tower.prototype.constructor = Tower;
 Tower.prototype.update = function() {
-  if (this.target != 0) { //Tower has target
-    this.target.healthbar.health -= this.attack;
-    if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx)) ^ 2) + (Math.abs((this.y - this.target.comy)) ^ 2)) > this.range) {
-      this.target = 0;
-    }
-  }
   if (this.target == 0) { //Tower has no target
     var newtarget = 0;
     var farthest = 0;
     for (var i = 0; i < this.gameBoard.enemies.length; i++) {
-      //If enemy is in range
       if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - this.gameBoard.enemies[i].comy)) ^ 2)) <= this.range) {
-        //If enemy x value greater than current target
         if (this.gameBoard.enemies[i].comx > farthest) {
           farthest = this.gameBoard.enemies[i].comx;
           newtarget = this.gameBoard.enemies[i];
@@ -34,25 +29,31 @@ Tower.prototype.update = function() {
       }
     }
     this.target = newtarget;
+  } else { //tower has target
+	if (this.timer == 0) { //ready to attack
+		this.projectile = new Projectile(this.x, this.y, this.target, this.attack);
+	}
+	this.timer += 1;
+	if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx)) ^ 2) + (Math.abs((this.y - this.target.comy)) ^ 2)) > this.range) {
+		this.target = 0;
+	}
+  }
+  
+  if (this.projectile != 0) {
+	this.projectile.update();
+	if (this.projectile.hit) {
+		this.projectile = 0;
+	}
+  }
+  
+  if (this.timer == this.cooldown) {
+	this.timer = 0;
   }
 }
 Tower.prototype.draw = function(ctx) {
   ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size, this.size, this.size, this.size, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
-  // this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
-  // var that = this;
-  // setTimeout(function () {
-  // that.d = 1;
-  // }, 2000);
-  // if(this.d == 1)  {
-  // this.animation2.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
-  // }
-
-  if (this.target != 0) {
-    ctx.beginPath();
-    ctx.strokeStyle = "#00FF00";
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.target.comx, this.target.comy);
-    ctx.stroke();
+  if (this.projectile != 0) {
+	this.projectile.draw(ctx);
   }
 }
 
@@ -68,38 +69,48 @@ function AOETower(gameboard, xindex, yindex) {
   this.animation = new Animation(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size, this.size, this.size, this.size, this.x, this.y, this.size, this.size);
   console.log(this.x + "," + this.y);
   this.range = 15;
-  this.attack = .03;
-  this.target = [];
+  this.attack = 3;
+  this.targets = [];
+  this.projectiles = [];
+  this.timer = 0;
+  this.cooldown = 45;
 
 }
 AOETower.prototype = new Entity();
 AOETower.prototype.constructor = AOETower;
 AOETower.prototype.update = function() {
-  for (var i = 0; i < this.gameBoard.enemies.length; i++) {
-    if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - this.gameBoard.enemies[i].comy)) ^ 2)) <= this.range) {
-      this.gameBoard.enemies[i].healthbar.health -= this.attack;
-    }
-  }
+	if (this.timer == 0) {
+	  for (var i = 0; i < this.gameBoard.enemies.length; i++) {
+		if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - this.gameBoard.enemies[i].comy)) ^ 2)) <= this.range) {
+		  this.targets.push(this.gameBoard.enemies[i]);
+		  this.projectiles.push(new Projectile(this.x, this.y, this.gameBoard.enemies[i], this.attack));
+		}
+	  }
+
+	  for (var i = 0; i < this.targets.length; i++) {
+		if (Math.sqrt((Math.abs((this.x - this.targets[i].comx)) ^ 2) + (Math.abs((this.y - this.targets[i].comy)) ^ 2)) > this.range) {
+			this.targets.splice(i, 1);
+		}
+	  }
+	}
+	for (var i = 0; i < this.projectiles.length; i++) {
+	this.projectiles[i].update();
+	if (this.projectiles[i].hit) {
+		this.projectiles.splice(i,1);
+	}
+	}
+	this.timer += 1;
+	if (this.timer == this.cooldown) {
+		this.timer = 0;
+	}
+
 }
 AOETower.prototype.draw = function(ctx) {
   ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-buildings.png"), 400, 360, 100, 100, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
-  //this.animation.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
-  // var that = this;
-  // setTimeout(function () {
-  // that.d = 1;
-  // }, 2000);
-  // if(this.d == 1)  {
-  // this.animation2.drawFrame(gameboard.game.clockTick, ctx, this.size * this.xindex, this.size * this.yindex);
-  // }
-
-  for (var i = 0; i < this.gameBoard.enemies.length; i++) {
-    if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - this.gameBoard.enemies[i].comy)) ^ 2)) <= this.range) {
-      ctx.beginPath();
-      ctx.strokeStyle = "red";
-      ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.gameBoard.enemies[i].comx, this.gameBoard.enemies[i].comy);
-      ctx.stroke();
-    }
+  for (var i = 0; i < this.projectiles.length; i++) {
+	if (!this.projectiles[i].hit){
+		this.projectiles[i].draw(ctx);
+	}
   }
 }
 
@@ -148,4 +159,34 @@ SlowTower.prototype.draw = function(ctx) {
       ctx.stroke();
     }
   }
+}
+
+function Projectile(startx, starty, target, damage) {
+	this.x = startx;
+	this.y = starty;
+	this.scale = 20;
+	this.endx = target.comx + this.scale * target.speed;
+	this.endy = target.comy;
+	this.vx = (this.endx - startx)/this.scale;
+	this.vy = (this.endy - starty)/this.scale;
+	this.target = target;
+	this.damage = damage;
+	this.hit = false;
+}
+
+Projectile.prototype.constructor = Projectile;
+Projectile.prototype.update = function() {
+	if (Math.sqrt((Math.abs((this.x - this.endx)) ^ 2) + (Math.abs((this.y - this.endy)) ^ 2)) <= 3) {
+		this.hit = true;
+	}
+	if (!this.hit) {
+		this.x += this.vx;
+		this.y += this.vy;
+	} else {
+		this.target.healthbar.health -= this.damage;
+	}
+}
+Projectile.prototype.draw = function(ctx) {
+	ctx.fillStyle = "white";
+	ctx.fillRect(this.x, this.y, 5, 5);
 }

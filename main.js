@@ -225,10 +225,9 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 function GameBoard(game) {
   // increase as game level
   this.unitsCoeff = 1;
-
-
+  
   this.gameEngine = game;
-
+  
   this.background = new Background(this);
   this.building = new Building(this);
   this.toolbar = new Toolbar(this);
@@ -239,13 +238,12 @@ function GameBoard(game) {
   this.cost = [100, 250, 150, 500, 200, 300];
   this.enemies = [];
   this.towers = [];
-
-
   this.matrixmap = [];
   // Adjust these 3 variables to change grid size.
   this.gridwidth = 22;
   this.gridheight = 11;
   this.size = 65;
+  
   for (var i = 0; i < this.gridwidth; i++) {
     this.matrixmap.push([]);
     for (var j = 0; j < this.gridheight; j++) {
