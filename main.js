@@ -233,9 +233,11 @@ function GameBoard(game) {
   this.toolbar = new Toolbar(this);
 
   this.buildmode = 0;
-  this.money = 340;
+  this.money = 250;
   this.score = 0;
   this.cost = [100, 250, 150, 500, 200, 300];
+  this.attack = [4, 6];
+  this.cooldowns = [30, 120];
   this.enemies = [];
   this.towers = [];
   this.matrixmap = [];

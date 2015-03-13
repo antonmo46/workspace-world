@@ -8,11 +8,12 @@ function Tower(gameboard, xindex, yindex) {
   this.x = xindex * this.size + this.size / 2;
   this.y = yindex * this.size + this.size / 2;
   this.range = 15;
-  this.attack = 4;
+  this.attack = gameboard.attack[0];
+  this.timer = 0;
+  this.cooldown = gameboard.cooldowns[0];
   this.target = 0;
   this.projectile = 0;
-  this.timer = 0;
-  this.cooldown = 30;
+
 }
 Tower.prototype = new Entity();
 Tower.prototype.constructor = Tower;
@@ -69,11 +70,11 @@ function AOETower(gameboard, xindex, yindex) {
   this.animation = new Animation(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size, this.size, this.size, this.size, this.x, this.y, this.size, this.size);
   console.log(this.x + "," + this.y);
   this.range = 15;
-  this.attack = 3;
+  this.attack = gameboard.attack[1];
   this.targets = [];
   this.projectiles = [];
   this.timer = 0;
-  this.cooldown = 45;
+  this.cooldown = gameboard.cooldowns[1];
 
 }
 AOETower.prototype = new Entity();
@@ -99,9 +100,10 @@ AOETower.prototype.update = function() {
 		this.projectiles.splice(i,1);
 	}
 	}
-	this.timer += 1;
 	if (this.timer == this.cooldown) {
 		this.timer = 0;
+	} else {
+		this.timer += 1;
 	}
 
 }
