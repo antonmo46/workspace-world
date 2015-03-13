@@ -17,7 +17,7 @@ function Grunt(gameboard) {
   this.attacking = false;
   this.bounty = gameboard.bounties[2];
   this.attack = gameboard.attack[4];
-  this.speed = gameboard.speeds[2]];
+  this.speed = gameboard.speeds[2];
   this.radius = 100;
   this.ground = 400;
   this.slowed = false;
@@ -70,7 +70,7 @@ function Troll(gameboard) {
   this.attacking = false;
   this.bounty = gameboard.bounties[1];
   this.attack = gameboard.attack[3];
-  this.speed =  gameboard.speeds[1]];
+  this.speed =  gameboard.speeds[1];
   this.radius = 100;
   this.ground = 400;
   this.slowed = false;
@@ -119,8 +119,8 @@ function Ogre(gameboard) {
   this.attackAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), this.direction, 365, this.frameWidth, this.frameWidth, 0.10, 4, true, true);
   this.dieAnimation = new Animation(ASSET_MANAGER.getAsset("./img/ogre-2.png"), (73 * 9), 0, this.frameWidth, this.frameWidth, 1, 5, true, true);
   this.attacking = false;
-  this.attack = gameboard.attack[0];
-  this.speed =  gameboard.speeds[0]];
+  this.attack = gameboard.attack[2];
+  this.speed =  gameboard.speeds[0];
   this.bounty = gameboard.bounties[0];
   this.radius = 100;
   this.ground = 400;
