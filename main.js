@@ -223,21 +223,27 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 
 /*############## Board #############*/
 function GameBoard(game) {
-  // increase as game level
-  this.unitsCoeff = 1;
-  
-  this.gameEngine = game;
-  
+  this.gameEngine = game; 
   this.background = new Background(this);
   this.building = new Building(this);
   this.toolbar = new Toolbar(this);
-
   this.buildmode = 0;
-  this.money = 250;
   this.score = 0;
-  this.cost = [100, 250, 150, 500, 200, 300];
-  this.attack = [4, 6];
-  this.cooldowns = [30, 120];
+  //-------------BALANCE-------------------------
+  // increase as game level
+  this.unitsCoeff = 1;
+  // starting money
+  this.money = 250;
+  //		   norm, aoe, slow, fire, heal, mage 
+  this.cost = [100,  250, 150,  800,  400,  300];
+  //           		norm, aoe, ogre, troll, grunt
+  this.attack =    [4,    6,   .1,   .05,   .05];
+  //				norm  aoe                    
+  this.cooldowns = [30,   120];
+  //			   ogre, troll, grunt            
+  this.bounties = [50,   35,    25];
+  this.speeds =   [1,    1.82,  2.5];
+  //---------------------------------------------
   this.enemies = [];
   this.towers = [];
   this.matrixmap = [];
