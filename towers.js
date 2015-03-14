@@ -177,7 +177,7 @@ function Projectile(startx, starty, target, damage) {
 	this.damage = damage;
 	this.hit = false;
 	var audio = new Audio('sound/arrow_launch.mp3');
-	audio.volume = .009;
+	audio.volume = .035;
 	audio.play();
 }
 
