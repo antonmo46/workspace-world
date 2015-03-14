@@ -34,6 +34,31 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy) {
     locX, locY, this.frameWidth * scaleBy,
     this.frameHeight * scaleBy);
 }
+
+Animation.prototype.drawFireFrame = function (tick, ctx, x, y) {
+	//console.log("elapsed time= " + this.elapsedTime);
+    this.elapsedTime += tick;
+    if (this.isDone()) {
+        if (this.loop) {
+			this.elapsedTime = 0;
+		}
+    } else {
+		var frame = this.currentFrame();
+		var xindex = 0;
+		var yindex = 0;
+		xindex = frame % 4 ;
+
+		console.log(frame + " " + xindex + " " + yindex);
+
+		ctx.drawImage(this.spriteSheet,
+					 xindex * this.frameWidth + frame*2, yindex * this.frameHeight,
+					 this.frameWidth, this.frameHeight,
+					 x, y,
+					 this.frameWidth,
+					 this.frameHeight);
+				 
+	}
+}
 Animation.prototype.currentFrame = function() {
   return Math.floor(this.elapsedTime / this.frameDuration);
 }
@@ -116,6 +141,10 @@ Toolbar.prototype.update = function() {
     if (this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly + 300 && this.cy <= this.ly + 300 + 65) {
       if (this.gameBoard.money >= this.gameBoard.cost[3]) {
         this.gameBoard.money -= this.gameBoard.cost[3];
+		this.gameBoard.firewaveOn = true;
+		setTimeout(function() {
+			gameboard.firewaveOn = false;
+		}, 400)
         for (var i = 0; i < this.gameBoard.enemies.length; i++) {
           this.gameBoard.enemies[i].healthbar.health = this.gameBoard.enemies[i].healthbar.health / 2;
         }
@@ -220,22 +249,36 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
   ctx.fillStyle = this.color;
   ctx.fillRect(pos1 + this.offset, pos2, fixed * this.width, this.height);
 }
+/*########## Fire Wave #################*/
+function Firewave(game, spritesheet) {
+    this.animation = new Animation(spritesheet,0,600, 164, 344, .1, 4, true, false);
+    this.x = 0;
+    this.y = 700;
+    this.game = game;
+}
+Firewave.prototype.constructor = Firewave;
+Firewave.prototype.update = function() {
+
+}
+Firewave.prototype.draw = function (ctx) {
+    this.animation.drawFireFrame(this.game.clockTick, ctx, this.x, this.y, 1);
+}
 
 /*############## Board #############*/
 function GameBoard(game) {
-  // increase as game level
-  this.unitsCoeff = 1;
-  // starting money
-  this.money = 250;
+  this.unitsCoeff = 1;// increase as game level
+  this.money = 250;// starting money
   this.gameEngine = game; 
   this.background = new Background(this);
   this.building = new Building(this);
   this.toolbar = new Toolbar(this);
+  this.firewave = new Firewave(game, ASSET_MANAGER.getAsset("./img/fire.png"));
+  this.firewaveOn = false;
   this.buildmode = 0;
   this.score = 0;
   //-------------BALANCE-------------------------
   //		   norm, aoe, slow, fire, heal, mage 
-  this.cost = [100,  250, 150,  800,  400,  300];
+  this.cost = [100,  250, 150,  1,  400,  300];
   //           		norm, aoe, ogre, troll, grunt
   this.attack =    [4,    3,   .1,   .05,   .05];
   //				norm  aoe                    
@@ -251,7 +294,8 @@ function GameBoard(game) {
   this.gridwidth = 22;
   this.gridheight = 11;
   this.size = 65;
-  
+ 
+  //Initialize matrixmap
   for (var i = 0; i < this.gridwidth; i++) {
     this.matrixmap.push([]);
     for (var j = 0; j < this.gridheight; j++) {
@@ -333,7 +377,7 @@ GameBoard.prototype.draw = function(ctx) {
   this.background.draw(ctx);
   this.toolbar.draw(ctx);
   this.building.draw(ctx);
-
+  //Draw towers
   for (var i = 0; i < this.towers.length; i++) {
     this.towers[i].draw(ctx);
   }
@@ -376,6 +420,10 @@ GameBoard.prototype.draw = function(ctx) {
     }
     ctx.restore();
   }
+  //Draw fire wave if active
+  if (this.firewaveOn) {
+	this.firewave.draw(ctx);
+  }
   Entity.prototype.draw.call(this);
 }
 GameBoard.prototype.spawnWaves = function() {
@@ -405,7 +453,7 @@ GameBoard.prototype.spawnWaves = function() {
         //that2 = this;
         setTimeout(function() {
           that.lock = 0;
-        }, 5000);
+        }, 25000);
         that.monsters = 0;
         that.wave_size = that.wave_size + 3;
         that.wave_num++;
@@ -448,6 +496,7 @@ ASSET_MANAGER.queueDownload("./img/tower1_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower2_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower3_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/arrow.png");
+ASSET_MANAGER.queueDownload("./img/fire.png");
 
 
 ASSET_MANAGER.downloadAll(function() {
