@@ -33,6 +33,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy) {
     this.frameWidth, this.frameHeight,
     locX, locY, this.frameWidth * scaleBy,
     this.frameHeight * scaleBy);
+	
 }
 
 Animation.prototype.drawFireFrame = function (tick, ctx, x, y) {
@@ -49,7 +50,7 @@ Animation.prototype.drawFireFrame = function (tick, ctx, x, y) {
 		xindex = frame % 4 ;
 
 		console.log(frame + " " + xindex + " " + yindex);
-
+		ctx.fillRect(0,300,1450,100);
 		ctx.drawImage(this.spriteSheet,
 					 xindex * this.frameWidth + frame*2, yindex * this.frameHeight,
 					 this.frameWidth, this.frameHeight,
@@ -251,7 +252,7 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 }
 /*########## Fire Wave #################*/
 function Firewave(game, spritesheet) {
-    this.animation = new Animation(spritesheet,0,600, 164, 344, .1, 4, true, false);
+    this.animation = new Animation(spritesheet,0,300, 164, 344, .1, 4, true, false);
     this.x = 0;
     this.y = 700;
     this.game = game;
