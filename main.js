@@ -237,7 +237,7 @@ function GameBoard(game) {
   //		   norm, aoe, slow, fire, heal, mage 
   this.cost = [100,  250, 150,  800,  400,  300];
   //           		norm, aoe, ogre, troll, grunt
-  this.attack =    [4,    6,   .1,   .05,   .05];
+  this.attack =    [4,    3,   .1,   .05,   .05];
   //				norm  aoe                    
   this.cooldowns = [30,   120];
   //			   ogre, troll, grunt            
@@ -447,6 +447,7 @@ ASSET_MANAGER.queueDownload("./img/mage_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower1_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower2_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower3_tooltip.png");
+ASSET_MANAGER.queueDownload("./img/arrow.png");
 
 
 ASSET_MANAGER.downloadAll(function() {

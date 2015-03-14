@@ -12,7 +12,7 @@ function Tower(gameboard, xindex, yindex) {
   this.timer = 0;
   this.cooldown = gameboard.cooldowns[0];
   this.target = 0;
-  this.projectile = 0;
+  this.projectiles = [];
 
 }
 Tower.prototype = new Entity();
@@ -32,7 +32,7 @@ Tower.prototype.update = function() {
     this.target = newtarget;
   } else { //tower has target
 	if (this.timer == 0) { //ready to attack
-		this.projectile = new Projectile(this.x, this.y, this.target, this.attack);
+		this.projectiles.push(new Projectile(this.x, this.y, this.target, this.attack));
 	}
 	this.timer += 1;
 	if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx)) ^ 2) + (Math.abs((this.y - this.target.comy)) ^ 2)) > this.range) {
@@ -40,10 +40,10 @@ Tower.prototype.update = function() {
 	}
   }
   
-  if (this.projectile != 0) {
-	this.projectile.update();
-	if (this.projectile.hit) {
-		this.projectile = 0;
+  for (var i = 0; i < this.projectiles.length; i++) {
+	this.projectiles[i].update();
+	if (this.projectiles[i].hit) {
+		this.projectiles.splice(i,1);
 	}
   }
   
@@ -53,8 +53,10 @@ Tower.prototype.update = function() {
 }
 Tower.prototype.draw = function(ctx) {
   ctx.drawImage(ASSET_MANAGER.getAsset("./img/human-towers.png"), this.size, this.size, this.size, this.size, this.xindex * this.size, this.yindex * this.size, this.size, this.size);
-  if (this.projectile != 0) {
-	this.projectile.draw(ctx);
+  for (var i = 0; i < this.projectiles.length; i++) {
+	  if (!this.projectiles[i].hit){
+		this.projectiles[i].draw(ctx);
+	  } 
   }
 }
 
@@ -174,6 +176,9 @@ function Projectile(startx, starty, target, damage) {
 	this.target = target;
 	this.damage = damage;
 	this.hit = false;
+	var audio = new Audio('sound/arrow_launch.mp3');
+	audio.volume = .009;
+	audio.play();
 }
 
 Projectile.prototype.constructor = Projectile;
@@ -189,6 +194,10 @@ Projectile.prototype.update = function() {
 	}
 }
 Projectile.prototype.draw = function(ctx) {
-	ctx.fillStyle = "white";
-	ctx.fillRect(this.x, this.y, 5, 5);
+	var angle = Math.atan2(this.endy - this.y, this.endx - this.x) + .25*Math.PI;
+	ctx.translate(this.x+20, this.y+20);
+	ctx.rotate(angle);
+	ctx.translate(-this.x-20, -this.y-20);
+	ctx.drawImage(ASSET_MANAGER.getAsset("./img/arrow.png"), 0, 0, 250, 234, this.x-20 , this.y+20, 40, 40);  // draw image
+	ctx.setTransform(1,0,0,1,0,0); 
 }
