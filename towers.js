@@ -32,7 +32,7 @@ Tower.prototype.update = function() {
     this.target = newtarget;
   } else { //tower has target
 	if (this.timer == 0) { //ready to attack
-		this.projectiles.push(new Projectile(this.x, this.y, this.target, this.attack));
+		this.projectiles.push(new Projectile(this.x-20, this.y-20, this.target, this.attack));
 	}
 	this.timer += 1;
 	if (this.target.healthbar.health <= 0 || Math.sqrt((Math.abs((this.x - this.target.comx)) ^ 2) + (Math.abs((this.y - this.target.comy)) ^ 2)) > this.range) {
@@ -86,7 +86,7 @@ AOETower.prototype.update = function() {
 	  for (var i = 0; i < this.gameBoard.enemies.length; i++) {
 		if (Math.sqrt((Math.abs((this.x - this.gameBoard.enemies[i].comx)) ^ 2) + (Math.abs((this.y - this.gameBoard.enemies[i].comy)) ^ 2)) <= this.range) {
 		  this.targets.push(this.gameBoard.enemies[i]);
-		  this.projectiles.push(new Projectile(this.x, this.y, this.gameBoard.enemies[i], this.attack));
+		  this.projectiles.push(new Projectile(this.x-20, this.y-20, this.gameBoard.enemies[i], this.attack));
 		}
 	  }
 
@@ -183,7 +183,7 @@ function Projectile(startx, starty, target, damage) {
 
 Projectile.prototype.constructor = Projectile;
 Projectile.prototype.update = function() {
-	if (Math.sqrt((Math.abs((this.x - this.endx)) ^ 2) + (Math.abs((this.y - this.endy)) ^ 2)) <= 3) {
+	if (Math.sqrt((Math.abs((this.x - this.endx)) ^ 2) + (Math.abs((this.y - this.endy)) ^ 2)) <= 2) {
 		this.hit = true;
 	}
 	if (!this.hit) {
@@ -198,6 +198,6 @@ Projectile.prototype.draw = function(ctx) {
 	ctx.translate(this.x+20, this.y+20);
 	ctx.rotate(angle);
 	ctx.translate(-this.x-20, -this.y-20);
-	ctx.drawImage(ASSET_MANAGER.getAsset("./img/arrow.png"), 0, 0, 250, 234, this.x-20 , this.y+20, 40, 40);  // draw image
+	ctx.drawImage(ASSET_MANAGER.getAsset("./img/arrow.png"), 0, 0, 250, 234, this.x , this.y, 40, 40);  // draw image
 	ctx.setTransform(1,0,0,1,0,0); 
 }
