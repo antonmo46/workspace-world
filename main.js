@@ -36,7 +36,7 @@ Animation.prototype.drawFrame = function(tick, ctx, x, y, scaleBy) {
 	
 }
 
-Animation.prototype.drawFireFrame = function (tick, ctx, x, y) {
+Animation.prototype.drawFireFrame = function (tick, ctx, xx, yy) {
 	//console.log("elapsed time= " + this.elapsedTime);
     this.elapsedTime += tick;
     if (this.isDone()) {
@@ -49,14 +49,17 @@ Animation.prototype.drawFireFrame = function (tick, ctx, x, y) {
 		var yindex = 0;
 		xindex = frame % 4 ;
 
-		console.log(frame + " " + xindex + " " + yindex);
-		ctx.fillRect(0,300,1450,100);
-		ctx.drawImage(this.spriteSheet,
-					 xindex * this.frameWidth + frame*2, yindex * this.frameHeight,
-					 this.frameWidth, this.frameHeight,
-					 x, y,
-					 this.frameWidth,
-					 this.frameHeight);
+		//console.log(frame + " " + xindex + " " + yindex);
+		//ctx.fillRect(0,300,1450,100);
+		for (var i = 0; i < 19; i++) {
+			var pos = i*75;
+			ctx.drawImage(this.spriteSheet,
+						 xindex * this.frameWidth + frame*2, yindex * this.frameHeight,
+						 this.frameWidth, this.frameHeight,
+						 pos, yy,
+						 this.frameWidth,
+						 this.frameHeight);
+		}
 				 
 	}
 }
@@ -254,7 +257,7 @@ Healthbar.prototype.draw = function(pos1, pos2, ctx) {
 function Firewave(game, spritesheet) {
     this.animation = new Animation(spritesheet,0,300, 164, 344, .1, 4, true, false);
     this.x = 0;
-    this.y = 700;
+    this.y = 70;
     this.game = game;
 }
 Firewave.prototype.constructor = Firewave;
@@ -262,7 +265,8 @@ Firewave.prototype.update = function() {
 
 }
 Firewave.prototype.draw = function (ctx) {
-    this.animation.drawFireFrame(this.game.clockTick, ctx, this.x, this.y, 1);
+	this.animation.drawFireFrame(this.game.clockTick, ctx, 0, this.y);
+
 }
 
 /*############## Board #############*/
@@ -279,7 +283,7 @@ function GameBoard(game) {
   this.score = 0;
   //-------------BALANCE-------------------------
   //		   norm, aoe, slow, fire, heal, mage 
-  this.cost = [100,  250, 150,  1,  400,  300];
+  this.cost = [100,  250, 150,  800,  400,  300];
   //           		norm, aoe, ogre, troll, grunt
   this.attack =    [4,    3,   .1,   .05,   .05];
   //				norm  aoe                    
