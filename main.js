@@ -315,7 +315,7 @@ Heal.prototype.draw = function (ctx) {
 /*############## Board #############*/
 function GameBoard(game) {
   this.unitsCoeff = 1;// increase as game level
-  this.money = 5000;// starting money
+  this.money = 250;// starting money
   this.gameEngine = game; 
   this.background = new Background(this);
   this.building = new Building(this);
