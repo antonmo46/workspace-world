@@ -254,7 +254,9 @@ Toolbar.prototype.draw = function(ctx) {
   var text = this.ly + 200;
   ctx.fillText("Money: " + this.gameBoard.money, this.lx, text);
   ctx.fillText("Score: " + this.gameBoard.score, this.lx, text + 20);
-  ctx.fillText("Time: " + parseInt(this.gameBoard.gameEngine.timer.gameTime, 10) + " sec(s)", this.lx, text + 40);
+  ctx.fillText("Next wave: " + this.gameBoard.waveTimer, this.lx, text + 40);
+  ctx.fillText("Wave: " + this.gameBoard.wave_num, this.lx, text + 60);
+  
 
   //Ability buttons
   this.abilitybutton(ctx, "./img/firewave.png", this.lx, this.ly + 300, "Fire Wave", this.gameBoard.cost[3], "./img/firewave_tooltip.png");
@@ -314,8 +316,8 @@ Heal.prototype.draw = function (ctx) {
 
 /*############## Board #############*/
 function GameBoard(game) {
-  this.unitsCoeff = 1;// increase as game level
-  this.money = 250;// starting money
+  this.unitsCoeff = 1.2;// increase as game level
+  this.money = 200;// starting money
   this.gameEngine = game; 
   this.background = new Background(this);
   this.building = new Building(this);
@@ -324,6 +326,8 @@ function GameBoard(game) {
   this.firewaveOn = false;
   this.heal = new Heal(game, ASSET_MANAGER.getAsset("./img/heal.png"));
   this.healOn = false;
+  this.waveTimer = 25;
+  this.wave_num = 1;
   this.buildmode = 0;
   this.score = 0;
   //-------------BALANCE-------------------------
@@ -356,6 +360,12 @@ function GameBoard(game) {
       }
     }
   }
+  
+  	setInterval(function() {
+		if (gameboard.waveTimer > 0) {
+			gameboard.waveTimer--;
+		}
+	}, 1000);
   Entity.call(this, game, 20, 20);
 }
 GameBoard.prototype = new Entity();
@@ -483,13 +493,13 @@ GameBoard.prototype.spawnWaves = function() {
   this.monsters = 0;
   this.wave_size = 3;
   this.lock = 0;
-  this.wave_num = 0;
-  this.wave_last_updated = 0;
-
+  this.wave_last_updated = 0
+  
   var that = this;
 
   (function loop() {
     var rand = Math.round(Math.random() * 1000);
+	console.log(rand);	
     setTimeout(function() {
       if (that.lock === 0) {
         that.monsters++;
@@ -506,18 +516,22 @@ GameBoard.prototype.spawnWaves = function() {
         //that2 = this;
         setTimeout(function() {
           that.lock = 0;
+		  if (gameboard.waveTimer <= 0) {
+			gameboard.wave_num++;
+			gameboard.waveTimer = 25;
+			var horn = new Audio("sound/wavehorn.mp3");
+			horn.play();
+			}
         }, 25000);
         that.monsters = 0;
         that.wave_size = that.wave_size + 3;
-        that.wave_num++;
-
       }
-      console.log("count " + that.wave_num);
+      //console.log("count " + that.wave_num);
       if(that.wave_num % 4 ===0 && Math.floor(that.wave_num / 4) !== that.wave_last_updated){
         that.wave_last_updated = Math.floor(that.wave_num / 4);
-        console.log("last " + that.wave_last_updated);
+        //console.log("last " + that.wave_last_updated);
         that.unitsCoeff = that.unitsCoeff * 1.7;
-        console.log("coeff " + that.unitsCoeff);
+        //console.log("coeff " + that.unitsCoeff);
       }
       if (that.gameEngine.gameover === 0) {
         loop();
@@ -565,11 +579,15 @@ ASSET_MANAGER.downloadAll(function() {
   gameEngine.start();
   var audio = new Audio('sound/Game of Thrones.mp3');
   audio.loop = true;
-  audio.volume = .9;
+  audio.volume = .6;
   audio.play();
 });
 
 function start() {
+  gameboard.waveTimer = 25;
+  var horn = new Audio("sound/wavehorn.mp3");
+  horn.volume=.4;
+  horn.play();
   document.getElementById("start").style.display = "none";
   gameboard.spawnWaves();
 }

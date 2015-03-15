@@ -172,7 +172,7 @@ function Projectile(startx, starty, target, damage) {
 	if (!target.slowed) {
 		this.endx = target.comx + this.scale * target.speed;
 	} else {
-		this.endx = target.comx + this.scale * (target.speed /2);
+		this.endx = target.comx + this.scale * (target.speed*.5);
 	}
 	this.endy = target.comy;
 	this.vx = (this.endx - startx)/this.scale;
