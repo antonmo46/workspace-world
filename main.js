@@ -63,6 +63,34 @@ Animation.prototype.drawFireFrame = function (tick, ctx, xx, yy) {
 				 
 	}
 }
+
+Animation.prototype.drawHealFrame = function (tick, ctx, xx, yy) {
+    this.elapsedTime += tick;
+    if (this.isDone()) {
+        if (this.loop) {
+			this.elapsedTime = 0;
+		}
+    } else {
+    var frame = this.currentFrame();
+    var xindex = 0;
+    var yindex = 0;
+	xindex = frame % 5 ;
+    yindex = Math.floor(frame/5);
+
+    ctx.drawImage(this.spriteSheet,
+                 xindex * this.frameWidth, yindex * this.frameHeight,
+                 this.frameWidth, this.frameHeight,
+                 xx, yy,
+                 this.frameWidth,
+                 this.frameHeight);
+				 
+	}
+	gameboard.building.healthbar.health += .5;
+    if (gameboard.building.healthbar.health > 100) {
+		gameboard.building.healthbar.health = 100;
+    }
+}
+
 Animation.prototype.currentFrame = function() {
   return Math.floor(this.elapsedTime / this.frameDuration);
 }
@@ -146,6 +174,9 @@ Toolbar.prototype.update = function() {
       if (this.gameBoard.money >= this.gameBoard.cost[3]) {
         this.gameBoard.money -= this.gameBoard.cost[3];
 		this.gameBoard.firewaveOn = true;
+		var audio = new Audio('sound/firewave.mp3');
+		audio.volume = 1;
+		audio.play();
 		setTimeout(function() {
 			gameboard.firewaveOn = false;
 		}, 400)
@@ -158,10 +189,13 @@ Toolbar.prototype.update = function() {
     if (this.cx >= this.lx && this.cx <= this.lx + 65 && this.cy >= this.ly + 375 && this.cy <= this.ly + 375 + 65) {
       if (this.gameBoard.money >= this.gameBoard.cost[4]) {
         this.gameBoard.money -= this.gameBoard.cost[4];
-        this.gameBoard.building.healthbar.health += 50;
-        if (this.gameBoard.building.healthbar.health > 100) {
-          this.gameBoard.building.healthbar.health = 100;
-        }
+		var audio = new Audio('sound/heal.mp3');
+		audio.volume = 1;
+		audio.play();
+		this.gameBoard.healOn = true;
+		setTimeout(function() {
+			gameboard.healOn = false;
+		}, 2500)
       }
     }
   }
@@ -261,12 +295,21 @@ function Firewave(game, spritesheet) {
     this.game = game;
 }
 Firewave.prototype.constructor = Firewave;
-Firewave.prototype.update = function() {
-
-}
 Firewave.prototype.draw = function (ctx) {
 	this.animation.drawFireFrame(this.game.clockTick, ctx, 0, this.y);
 
+}
+
+/*########## Heal #################*/
+function Heal(game, spritesheet) {
+    this.animation = new Animation(spritesheet,1300,200, 192, 192, .1, 25, true, false);
+    this.x = 1400;
+    this.y = 225;
+    this.game = game;
+}
+Heal.prototype.constructor = Heal;
+Heal.prototype.draw = function (ctx) {
+	this.animation.drawHealFrame(this.game.clockTick, ctx, this.x, this.y);
 }
 
 /*############## Board #############*/
@@ -279,6 +322,8 @@ function GameBoard(game) {
   this.toolbar = new Toolbar(this);
   this.firewave = new Firewave(game, ASSET_MANAGER.getAsset("./img/fire.png"));
   this.firewaveOn = false;
+  this.heal = new Heal(game, ASSET_MANAGER.getAsset("./img/heal.png"));
+  this.healOn = false;
   this.buildmode = 0;
   this.score = 0;
   //-------------BALANCE-------------------------
@@ -429,6 +474,9 @@ GameBoard.prototype.draw = function(ctx) {
   if (this.firewaveOn) {
 	this.firewave.draw(ctx);
   }
+    if (this.healOn) {
+	this.heal.draw(ctx);
+  }
   Entity.prototype.draw.call(this);
 }
 GameBoard.prototype.spawnWaves = function() {
@@ -502,6 +550,7 @@ ASSET_MANAGER.queueDownload("./img/tower2_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/tower3_tooltip.png");
 ASSET_MANAGER.queueDownload("./img/arrow.png");
 ASSET_MANAGER.queueDownload("./img/fire.png");
+ASSET_MANAGER.queueDownload("./img/heal.png");
 
 
 ASSET_MANAGER.downloadAll(function() {
@@ -516,6 +565,7 @@ ASSET_MANAGER.downloadAll(function() {
   gameEngine.start();
   var audio = new Audio('sound/Game of Thrones.mp3');
   audio.loop = true;
+  audio.volume = .9;
   audio.play();
 });
 
