@@ -317,7 +317,7 @@ Heal.prototype.draw = function (ctx) {
 /*############## Board #############*/
 function GameBoard(game) {
   this.unitsCoeff = 1.2;// increase as game level
-  this.money = 200;// starting money
+  this.money = 250;// starting money
   this.gameEngine = game; 
   this.background = new Background(this);
   this.building = new Building(this);
@@ -326,7 +326,7 @@ function GameBoard(game) {
   this.firewaveOn = false;
   this.heal = new Heal(game, ASSET_MANAGER.getAsset("./img/heal.png"));
   this.healOn = false;
-  this.waveTimer = 25;
+  this.waveTimer = 0;
   this.wave_num = 1;
   this.buildmode = 0;
   this.score = 0;
